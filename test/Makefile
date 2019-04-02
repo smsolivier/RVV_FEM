@@ -1,5 +1,5 @@
 override HOME := ./..
 include $(HOME)/Makefile 
 
-% : %.cpp Makefile $(OBJS) 
-	$(CXX) $(CFLAGS) $(OBJS) $(LIBS) $< -o $@ 
+% : %.cpp Makefile $(OBJS) $(ASM) 
+	$(CXX) $(CFLAGS) $(OBJS) $(LIBS) $(ASSEMBLER) $< -o $@ 

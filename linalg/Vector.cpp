@@ -1,5 +1,7 @@
 #include "Vector.hpp"
 
+extern "C" void VectorAdd_RV(int N, double* a, const double* b); 
+
 namespace fem 
 {
 
@@ -46,10 +48,14 @@ void Vector::operator*=(double val) {
 void Vector::operator+=(const Vector& a) {
 	CHECK(a.GetSize() == GetSize()); 
 
+#ifdef USE_RISCV
+	VectorAdd_RV(GetSize(), GetData(), a.GetData()); 
+#else
 	#pragma omp parallel for 
 	for (int i=0; i<GetSize(); i++) {
 		(*this)[i] += a[i]; 
 	}
+#endif
 }
 
 void Vector::operator-=(const Vector& a) {

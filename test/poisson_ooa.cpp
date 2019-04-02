@@ -57,7 +57,7 @@ void solve(int nref, int order, double& LinfE) {
 }
 
 int main(int argc, char* argv[]) {
-	int N = 5; 
+	int N = 4; 
 	if (argc > 1) N = atoi(argv[1]); 
 
 	double E1, E2; 
@@ -67,11 +67,13 @@ int main(int argc, char* argv[]) {
 	double p = log(E1/E2)/log(2); 
 	TEST(abs(p-2.) < 1e-1, "linear FEM p = " << p); 
 
+	N--; 
 	solve(N, 2, E1); 
 	solve(2*N, 2, E2); 
 	p = log(E1/E2)/log(2); 
 	TEST(abs(p-3.) < 1e-1, "quadratic FEM p = " << p); 
 
+	N--; 
 	solve(N, 3, E1); 
 	solve(2*N, 3, E2); 
 	p = log(E1/E2)/log(2); 

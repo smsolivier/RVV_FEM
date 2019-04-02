@@ -6,6 +6,7 @@
 #include "ElTrans.hpp"
 #include "FEMatrix.hpp"
 #include "FESpace.hpp"
+#include "General.hpp"
 #include "GridFunction.hpp"
 #include "L2Space.hpp"
 #include "LagrangeSpace.hpp"

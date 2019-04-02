@@ -1,15 +1,7 @@
 #include "Matrix.hpp"
 
-#ifdef USE_LAPACK
-// matrix vector product 
-extern "C" void dgemv_(char* TRANS, int* M, int* N, double* ALPHA, const double* A, 
-	int* LDA, const double* X, int* INCX, double* beta, double* Y, int* INCY); 
-// matrix matrix product 
-extern "C" void dgemm_(char* TRANSA, char* TRANSB, int* M, int* N, int* K, double* ALPHA, 
-	const double* A, int* LDA, const double* B, int* LDB, double* BETA, double* C, int* LDC); 
-// solve a system 
-extern "C" void dgesv_(int* n, int* nrhs, const double* a, int* lda, int* ipiv, 
-	double* b, int* ldb, int* info); 
+#ifdef USE_RISCV 
+extern "C" void MatVec_RV(int N, int M, const double* A, const double* x, double* b); 
 #endif
 
 using namespace std; 
@@ -56,13 +48,13 @@ Matrix& Matrix::operator=(const Matrix& m) {
 double& Matrix::operator()(int i, int j) {
 	CHECKMSG(i < _m && j < _n, 
 		"index = (" << i << ", " << j << "), size = " << _m << " x " << _n); 
-	return (*this)[i+j*_m]; 
+	return (*this)[i*_n+j]; 
 }
 
 double Matrix::operator()(int i, int j) const {
 	CHECK(i < _m); 
 	CHECK(j < _n); 
-	return (*this)[i+j*_m]; 
+	return (*this)[i*_n+j]; 
 }
 
 void Matrix::SetSize(int m, int n) {
@@ -168,7 +160,7 @@ void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {
 	for (int i=0; i<Height(); i++) {
 		for (int j=0; j<B.Width(); j++) {
 			for (int k=0; k<Width(); k++) {
-				C(i,j) += beta*C(i,j) + (*this)(i,k)*B(k,j); 
+				C(i,j) += beta*C(i,j) + alpha*(*this)(i,k)*B(k,j); 
 			}
 		}
 	}
@@ -199,20 +191,13 @@ void Matrix::Mult(double alpha, const Vector& x, double beta, Vector& b) const {
 	CHECKMSG(x.GetSize() == Width(), "size mismatch"); 
 	CHECKMSG(b.GetSize() == Height(), "size mismatch"); 
 
-#ifdef USE_LAPACK
-	char trans = 'N'; 
-	int M = Height(); 
-	int N = Width(); 
-	int LDA = M; 
-	int INCX = 1; 
-	int INCY = 1; 
-
-	dgemv_(&trans, &M, &N, &alpha, GetData(), &LDA, x.GetData(), &INCX, &beta, b.GetData(), &INCY); 
-#else 
+#ifdef USE_RISCV 
+	MatVec_RV(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
+#else
 	for (int i=0; i<Height(); i++) {
 		b[i] = beta * b[i]; 
 		for (int j=0; j<Width(); j++) {
-			b[i] += (*this)(i,j) * x[j]; 
+			b[i] += alpha*(*this)(i,j) * x[j]; 
 		}
 	}
 #endif

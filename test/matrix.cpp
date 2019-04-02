@@ -36,6 +36,18 @@ int main() {
 	}
 	TEST(pass, "resize"); 
 
+	// test matvec product 
+	Matrix m(3,3); 
+	m(0,0) = 2.; m(0,1) = 1.; m(1,0) = .5; m(1,1) = 2; m(1,2) = .5; m(2,2) = 1.; 
+	m(2,1) = .5; 
+	Vector x(3); 
+	for (int i=0; i<3; i++) {
+		x[i] = i+1; 
+	}
+	Vector mx; 
+	m.Mult(x, mx); 
+	TEST(mx[0]==4 && mx[1]==6 && mx[2]==4, "matvec (3x3)"); 
+
 	// test inverse 
 	Matrix a(2,2); 
 	a(0,0) = 2.; a(0,1) = 5.; a(1,1) = .5; 
@@ -52,9 +64,6 @@ int main() {
 	a.Solve(RHS, X); 
 	TEST(EQUAL(X[0], 1.) && EQUAL(X[1], 2.), "solve 2x2"); 
 
-	Matrix m(3,3); 
-	m(0,0) = 2.; m(0,1) = 1.; m(1,0) = .5; m(1,1) = 2; m(1,2) = .5; m(2,2) = 1.; 
-	m(2,1) = .5; 
 	Matrix minv; 
 	m.Inverse(minv); 
 	Matrix meye; 
@@ -70,15 +79,6 @@ int main() {
 		}
 	}
 	TEST(pass, "3x3 inverse + mult"); 
-
-	// test matvec product 
-	Vector x(3); 
-	for (int i=0; i<3; i++) {
-		x[i] = i+1; 
-	}
-	Vector mx; 
-	m.Mult(x, mx); 
-	TEST(mx[0]==4 && mx[1]==6 && mx[2]==4, "matvec (3x3)"); 
 
 	// add trans mult 
 	Matrix tmult(3); 
@@ -108,12 +108,12 @@ int main() {
 		}
 	}
 
-	A.Mult(1., B, 0., C); 
+	A.Mult(2., B, 0., C); 
 
 	for (int i=0; i<A.Height(); i++) {
 		for (int j=0; j<B.Width(); j++) {
 			for (int k=0; k<A.Width(); k++) {
-				C2(i,j) += A(i,k)*B(k,j); 
+				C2(i,j) += 2.*A(i,k)*B(k,j); 
 			}
 		}
 	}

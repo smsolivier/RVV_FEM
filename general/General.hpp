@@ -2,7 +2,7 @@
 #include <iostream> 
 #include <iomanip>
 #include <fstream>
-#include <cmath>
+#include <math.h>
 #include <vector> 
 #include <array> 
 #include <string> 
@@ -10,6 +10,10 @@
 #include <cstring>
 #ifdef USE_MPI 
 #include <mpi.h>
+#endif
+
+#ifndef M_PI 
+#define M_PI (3.14159265358979323846) 
 #endif
 
 #define DIM 3 
