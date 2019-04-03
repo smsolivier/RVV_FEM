@@ -23,3 +23,4 @@
 #include "SparseMatrix.hpp"
 #include "SquareMesh.hpp"
 #include "Vector.hpp"  
+#include "Writer.hpp"

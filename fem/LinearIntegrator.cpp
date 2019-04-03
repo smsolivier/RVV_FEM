@@ -6,7 +6,7 @@ namespace fem
 {
 
 void DomainIntegrator::Assemble(Element& el, Vector& elvec) {
-	Quadrature* quad = QRules.Get(el.GetType(), INTEGRATION_ORDER, INTEGRATION_TYPE); 
+	Quadrature* quad = QRules.Get(el.GetType(), 2*el.GetOrder()+1, INTEGRATION_TYPE); 
 	elvec.SetSize(el.GetNumNodes()); 
 	elvec = 0; 
 	ElTrans& trans = el.GetTrans(); 

@@ -34,6 +34,8 @@ public:
 	void SetID(int id) {_id = id; }
 	/// return the id number of this element 
 	int GetID() const {return _id; }
+	/// return the order of the element 
+	int GetOrder() const {return _order; }
 
 	/// access to FEM nodes in element 
 	Node& GetNode(int index); 

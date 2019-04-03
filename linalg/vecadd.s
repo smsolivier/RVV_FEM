@@ -9,6 +9,11 @@
 VectorAdd_RV:
 	slli a0, a0, 3 # length of vector in bytes 
 	add t0, a0, a1 # end pointer for a 
+	# add vl, x0, a0 
+	# vld v0, 0(a1) 
+	# vld v1, 0(a2) 
+	# vadd v2, v0, v1 
+	# vstx v3, 0, a1
 loop:
 	fld ft0, 0(a1) 
 	fld ft1, 0(a2) 

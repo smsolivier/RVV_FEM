@@ -13,6 +13,7 @@ FEM = $(HOME)/fem
 LINALG = $(HOME)/linalg 
 GENERAL = $(HOME)/general 
 MESH = $(HOME)/mesh 
+BUILD = $(HOME)/build
 
 # # where make searches for source files 
 VPATH = $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
@@ -34,12 +35,12 @@ CFLAGS = -std=c++17 -I$(UTILS) -I$(FEM) -I$(LINALG) -I$(GENERAL) -I$(MESH) -I$(H
 CFLAGS += $(OPT) $(VARS) 
 
 # store object files and dependency files 
-OBJ = $(HOME)/obj
-DEP = $(HOME)/dep
+OBJ = $(BUILD)/obj
+DEP = $(BUILD)/dep
 
 # get all file names for all .cpp files 
 SRCFILES = $(notdir $(wildcard $(HOME)/mesh/*.cpp $(HOME)/fem/*.cpp \
-	$(HOME)/linalg/*.cpp $(HOME)/general/*.cpp))
+	$(HOME)/linalg/*.cpp $(HOME)/general/*.cpp $(HOME)/utils/*.cpp))
 
 # convert to object files and dependency files 
 OBJS = $(patsubst %.cpp,$(OBJ)/%.o,$(SRCFILES))
@@ -52,12 +53,13 @@ $(OBJ)/%.o : %.cpp $(HOME)/Makefile
 	$(CXX) -MM $(CFLAGS) $(LIBS) $< | sed -e '1s@^@$(OBJ)\/@' > $*.d; mv $*.d $(DEP)
 
 all : $(OBJS) 
-tests : $(TESTS)
+tests : $(TESTS)	
 
 -include $(DEPS)
 
-cleanall : 
-	rm -rf $(OBJ); rm -rf $(DEP); rm -f $(TESTS) 
+clean: 
+	rm -rf $(BUILD)
+	rm -f $(TESTS) 
 
 listsrc : 
 	@echo $(SRCFILES) 

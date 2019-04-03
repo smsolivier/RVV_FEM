@@ -69,4 +69,71 @@ SquareMesh::SquareMesh(int Nx, int Ny, Point low, Point high, Array<int> bcs) {
 	FindNeighbors(); 
 }
 
+CubeMesh::CubeMesh(Array<int> N, Point low, Point high, Array<int> bc) {
+	CHECK(N.GetSize() == DIM); 
+	_n = N; 
+	_low = low; 
+	_high = high; 
+	_dim = 3; 
+
+	int Nn = 1; 
+	int Ne = 1; 
+	for (int d=0; d<N.GetSize(); d++) {
+		Nn *= (N[d] + 1); 
+		Ne *= N[d]; 
+	}
+
+	Point delta; 
+	for (int d=0; d<DIM; d++) {
+		delta[d] = (high[d] - low[d])/N[d]; 
+	}
+
+	// build nodes array 
+	auto flat = [N](int i, int j, int k) {return k + j*(N[0]+1) + i*(N[0]+1)*(N[1]+1); }; 
+	_nodes.Resize(Nn); 
+	for (int i=0; i<N[2]+1; i++) {
+		for (int j=0; j<N[1]+1; j++) {
+			for (int k=0; k<N[0]+1; k++) {
+				MeshNode node; 
+				node.id = flat(i,j,k); 
+				node.x[0] = k*delta[0] + low[0]; 
+				node.x[1] = j*delta[1] + low[1]; 
+				node.x[2] = i*delta[2] + low[2]; 
+
+				if (j==0) node.bc = bc[0]; 
+				else if (k==N[0]) node.bc = bc[1];
+				else if (j==N[1]) node.bc = bc[2]; 
+				else if (k==0) node.bc = bc[3]; 
+				else if (i==N[2]) node.bc = bc[4]; 
+				else if (i==0) node.bc = bc[5];  
+				else node.bc = INTERIOR; 
+				_nodes[node.id] = node; 
+			}
+		}
+	}
+
+	// build elements 
+	for (int i=0; i<N[2]; i++) {
+		for (int j=0; j<N[1]; j++) {
+			for (int k=0; k<N[0]; k++) {
+				MeshEl el; 
+				el.SetType(HEX); 
+				el.AddNode(flat(i,j,k)); 
+				el.AddNode(flat(i,j,k+1)); 
+				el.AddNode(flat(i,j+1,k+1)); 
+				el.AddNode(flat(i,j+1,k)); 
+
+				el.AddNode(flat(i+1,j,k)); 
+				el.AddNode(flat(i+1,j,k+1)); 
+				el.AddNode(flat(i+1,j+1,k+1)); 
+				el.AddNode(flat(i+1,j+1,k)); 
+
+				el.SetID(_el.GetSize()); 
+				_el.Append(el); 
+			}
+		}
+	}
+	FindNeighbors(); 
+}
+
 } // end namespace fem 

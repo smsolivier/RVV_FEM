@@ -42,4 +42,21 @@ private:
 	Point _high; 
 }; 
 
+/// cube mesh 
+class CubeMesh : public Mesh {
+public: 
+	/// default constructor 
+	CubeMesh() { } 
+	/// constructor 
+	CubeMesh(Array<int> N, Point low={0,0,0}, Point high={1,1,1}, 
+		Array<int> bc={DIRICHLET, DIRICHLET, DIRICHLET, DIRICHLET, DIRICHLET, DIRICHLET}); 
+private:
+	/// number of elements in x, y, z 
+	Array<int> _n; 
+	/// low corner 
+	Point _low; 
+	/// high corner 
+	Point _high; 
+}; 
+
 } // end namespace fem 

@@ -6,7 +6,7 @@ namespace fem
 {
 
 void WeakDiffusionIntegrator::Assemble(Element& el, Matrix& elmat) {
-	Quadrature* quad = QRules.Get(el.GetType(), INTEGRATION_ORDER, INTEGRATION_TYPE); 
+	Quadrature* quad = QRules.Get(el.GetType(), el.GetOrder()+1, INTEGRATION_TYPE); 
 	ElTrans& trans = el.GetTrans();
 	elmat.SetSize(el.GetNumNodes()); 
 	elmat = 0; 
