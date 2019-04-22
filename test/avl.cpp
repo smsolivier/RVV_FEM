@@ -5,7 +5,7 @@ using namespace fem;
 
 int main() {
 	HWCounter hwc; 
-	int N = 10; 
+	int N = 1000; 
 	Vector a(N); 
 	Vector b(N); 
 
@@ -15,10 +15,8 @@ int main() {
 	}
 
 	hwc.Reset(); 
-	// a += b; 
-	a *= 2.; 
+	a += b; 
+	// a *= 2.; 
 	hwc.Read(); 
-
-	a.Print(); 
-	// cout << hwc.AvgVecLen() << endl; 
+	cout << hwc.AvgVecLen() << endl; 
 }

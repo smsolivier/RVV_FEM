@@ -18,7 +18,6 @@ VectorScale_RV:
       VECTOR | FP | W64, \
       VECTOR | FP | W64, \
       0, 0)
-    vlds v3, a1 
 loop: 
 	setvl(t0, a0)
 	vld v4, 0(a2)

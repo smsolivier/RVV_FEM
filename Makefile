@@ -29,11 +29,12 @@ else
 	EXE = spike --isa=rv64gcv pk 
 endif 
 
-OPT = -O3 -ffast-math
+OPT = -O3 -ffast-math -DNDEBUG 
 # OPT = -g 
 
 # # where to look for header files 
-CFLAGS = -std=c++17 -I$(UTILS) -I$(FEM) -I$(LINALG) -I$(GENERAL) -I$(MESH) -I$(HOME) 
+CFLAGS = -std=c++17 -g -I$(UTILS) -I$(FEM) -I$(LINALG) \
+	-I$(GENERAL) -I$(MESH) -I$(HOME) 
 CFLAGS += $(OPT) $(VARS)
 
 # store object files and dependency files 
