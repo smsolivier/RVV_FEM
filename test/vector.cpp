@@ -36,6 +36,14 @@ int main() {
 	}
 	TEST(pass, "vector add"); 
 
+	b2 *= 2.; 
+	b2.Print(); 
+	for (int i=0; i<10; i++) {
+		if (fabs(b2[i] - 2.*i) > 1e-10) pass = false; 
+	}
+	TEST(pass, "scale vector"); 
+
+#if 0
 	// test vector matrix mult 
 	Vector x(2); 
 	x[0] = 2.; 
@@ -63,5 +71,6 @@ int main() {
 	Vector nor(2, -1.); 
 	nor[1] = 0.; 
 	double dot = nor * omega; 
-	TEST(EQUAL(-1., dot), "dot product"); 	
+	TEST(EQUAL(-1., dot), "dot product");
+#endif
 }

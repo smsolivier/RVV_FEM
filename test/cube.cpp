@@ -32,7 +32,7 @@ double ComputeError(int N, int p) {
 
 	K.ApplyDirichletBoundary(rhs); 
 
-	CG cg(&K, 1e-10, 1000); 
+	CG cg(&K, 1e-5, 1000); 
 	cg.Solve(rhs, x); 
 
 	FunctionCoefficient ex(Exact); 
@@ -46,7 +46,7 @@ double ComputeError(int N, int p) {
 }
 
 int main(int argc, char* argv[]) {
-	int N = 3; 
+	int N = 2; 
 	if (argc > 1) N = atoi(argv[1]); 
 
 	double E1, E2, p; 

@@ -18,18 +18,37 @@
 
 #define DIM 3 
 #define MESH_DIR ""
-#define INTEGRATION_ORDER 8
+#define INTEGRATION_ORDER 3
 #define INTEGRATION_TYPE 0
+
+#define read_csr(reg) ({ unsigned long __tmp; \
+  asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
+  __tmp; })
+
+#define write_csr(reg, val) ({ \
+  asm volatile ("csrw " #reg ", %0" :: "rK"(val)); })
+
+#define swap_csr(reg, val) ({ unsigned long __tmp; \
+  asm volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "rK"(val)); \
+  __tmp; })
+
+#define set_csr(reg, bit) ({ unsigned long __tmp; \
+  asm volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+  __tmp; })
+
+#define clear_csr(reg, bit) ({ unsigned long __tmp; \
+  asm volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+  __tmp; })
 
 // exit with error and backtracing 
 #define EXIT {\
 	std::cout << "encountered FATAL ERROR... aborting" << std::endl; \
-	exit(1); \
+	exit(EXIT_FAILURE); \
 }
 
 #define EXIT_NOBACKTRACE {\
 	std::cout << "encountered FATAL ERROR... aborting" << std::endl; \
-	exit(1); \
+	exit(EXIT_FAILURE); \
 }
 
 // give an error message and exit 

@@ -17,22 +17,24 @@ BUILD = $(HOME)/build
 
 # # where make searches for source files 
 VPATH = $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
-vpath %.s $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
+vpath %.S $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
 
-VARS = -DTESTING -DUSE_WARNINGS
+VARS = -DTESTING -DUSE_WARNINGS 
 ifeq ($(CXX), g++) 
+	EXE = ./
 else 
-	VARS += -DUSE_RISCV 
-	ASM = $(wildcard $(HOME)/linalg/*.s)
-	ASSEMBLER = $(ASM) -Wa,-march=rv64imafdcv
+	VARS += -DUSE_RISCV -march=rv64gc
+	ASM = $(wildcard $(HOME)/linalg/*.S)
+	ASSEMBLER = $(ASM) -Wa,-march=rv64gcv
+	EXE = spike --isa=rv64gcv pk 
 endif 
 
-OPT = -O3 -ffast-math -DNDEBUG 
+OPT = -O3 -ffast-math
 # OPT = -g 
 
 # # where to look for header files 
 CFLAGS = -std=c++17 -I$(UTILS) -I$(FEM) -I$(LINALG) -I$(GENERAL) -I$(MESH) -I$(HOME) 
-CFLAGS += $(OPT) $(VARS) 
+CFLAGS += $(OPT) $(VARS)
 
 # store object files and dependency files 
 OBJ = $(BUILD)/obj
@@ -46,20 +48,27 @@ SRCFILES = $(notdir $(wildcard $(HOME)/mesh/*.cpp $(HOME)/fem/*.cpp \
 OBJS = $(patsubst %.cpp,$(OBJ)/%.o,$(SRCFILES))
 DEPS = $(patsubst $(OBJ)/%.o,$(DEP)/%.d, $(OBJS))
 TESTS = $(basename $(wildcard $(HOME)/test/*.cpp))
+TESTOUT = $(addsuffix .out,$(TESTS)) 
 
 $(OBJ)/%.o : %.cpp $(HOME)/Makefile
-	mkdir -p $(OBJ); $(CXX) -c $(CFLAGS) $(LIBS) $< -o $@ 
+	mkdir -p $(OBJ)
+	$(CXX) -c $(CFLAGS) $(LIBS) $< -o $@ 
 	mkdir -p $(DEP)
 	$(CXX) -MM $(CFLAGS) $(LIBS) $< | sed -e '1s@^@$(OBJ)\/@' > $*.d; mv $*.d $(DEP)
 
 all : $(OBJS) 
-tests : $(TESTS)	
+tests : $(TESTS) 
+run : $(TESTOUT) 
+
+%.out : %
+	$(EXE)$<
 
 -include $(DEPS)
 
 clean: 
 	rm -rf $(BUILD)
 	rm -f $(TESTS) 
+	rm -f $(TESTOUT) 
 
 listsrc : 
 	@echo $(SRCFILES) 
@@ -70,7 +79,7 @@ listdep :
 listflags : 
 	@echo $(CFLAGS)
 listtests:
-	@echo $(TESTS) 
+	@echo $(TESTOUT) 
 listasm:
 	@echo $(ASM) 
 .PHONY : docs

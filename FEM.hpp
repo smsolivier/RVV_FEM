@@ -24,3 +24,4 @@
 #include "SquareMesh.hpp"
 #include "Vector.hpp"  
 #include "Writer.hpp"
+#include "HWCounter.hpp"

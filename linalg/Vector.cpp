@@ -1,6 +1,9 @@
 #include "Vector.hpp"
 
+// a += b 
 extern "C" void VectorAdd_RV(int N, double* a, const double* b); 
+// v *= alpha 
+extern "C" void VectorScale_RV(int N, double alpha, double* a); 
 
 namespace fem 
 {
@@ -38,11 +41,15 @@ Vector Vector::operator*(double val) const {
 }
 
 void Vector::operator*=(double val) {
-
+	CHECKMSG(GetSize() > 0, "vector not initialized"); 
+#ifdef USE_RISCV
+	VectorScale_RV(GetSize(), val, GetData()); 
+#else
 	#pragma omp parallel for 
 	for (int i=0; i<GetSize(); i++) {
 		(*this)[i] *= val; 
 	}
+#endif
 }
 
 void Vector::operator+=(const Vector& a) {
