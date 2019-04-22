@@ -29,7 +29,7 @@ else
 	EXE = spike --isa=rv64gcv pk 
 endif 
 
-OPT = -O3 -ffast-math -DNDEBUG 
+OPT = -O3 -ffast-math
 # OPT = -g 
 
 # # where to look for header files 

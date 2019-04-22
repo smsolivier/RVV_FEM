@@ -2,8 +2,17 @@
 
 // a += b 
 extern "C" void VectorAdd_RV(int N, double* a, const double* b); 
+// a -= b 
+extern "C" void VectorSub_RV(int N, double* a, const double* b);
+// a /= b 
+extern "C" void VectorDiv_RV(int N, double* a, const double* b);  
+// a *= b 
+extern "C" void VectorMul_RV(int N, double* a, const double* b);  
 // v *= alpha 
-extern "C" void VectorScale_RV(int N, double alpha, double* a); 
+extern "C" void VectorScale_RV(int N, double* a, double* alpha); 
+// outer product 
+extern "C" void VectorOP_RV(int Na, int Nb, const double* a, 
+	const double* b, double* M); 
 
 namespace fem 
 {
@@ -42,14 +51,14 @@ Vector Vector::operator*(double val) const {
 
 void Vector::operator*=(double val) {
 	CHECKMSG(GetSize() > 0, "vector not initialized"); 
-// #ifdef USE_RISCV
-	// VectorScale_RV(GetSize(), val, GetData()); 
-// #else
+#ifdef USE_RISCV
+	VectorScale_RV(GetSize(), GetData(), &val); 
+#else
 	#pragma omp parallel for 
 	for (int i=0; i<GetSize(); i++) {
 		(*this)[i] *= val; 
 	}
-// #endif
+#endif
 }
 
 void Vector::operator+=(const Vector& a) {
@@ -67,41 +76,54 @@ void Vector::operator+=(const Vector& a) {
 
 void Vector::operator-=(const Vector& a) {
 	CHECK(a.GetSize() == GetSize()); 
+#ifdef USE_RISCV
+	VectorSub_RV(GetSize(), GetData(), a.GetData()); 
+#else
 
 	#pragma omp parallel for 
 	for (int i=0; i<GetSize(); i++) {
 		(*this)[i] -= a[i]; 
 	}
+#endif
 }
 
 void Vector::operator/=(const Vector& a) {
 	CHECK(a.GetSize() == GetSize()); 
-
+#ifdef USE_RISCV
+	VectorDiv_RV(GetSize(), GetData(), a.GetData()); 
+#else
 	#pragma omp parallel for 
 	for (int i=0; i<GetSize(); i++) {
 		(*this)[i] /= a[i]; 
 	}
+#endif
 }
 
 void Vector::operator*=(const Vector& a) {
 	CHECK(a.GetSize() == GetSize()); 
-
+#ifdef USE_RISCV
+	VectorMul_RV(GetSize(), GetData(), a.GetData()); 
+#else
 	#pragma omp parallel for 
 	for (int i=0; i<GetSize(); i++) {
 		(*this)[i] *= a[i]; 
 	}
+#endif
 }
 
 void Vector::OuterProduct(const Vector& a, Matrix& b) const {
 	if (b.Height() != GetSize() || b.Width() != a.GetSize()) {
 		b.SetSize(GetSize(), a.GetSize()); 		
 	}
-
+#ifdef USE_RISCV
+	VectorOP_RV(GetSize(), a.GetSize(), GetData(), a.GetData(), b.GetData()); 
+#else
 	for (int i=0; i<GetSize(); i++) {
 		for (int j=0; j<a.GetSize(); j++) {
 			b(i,j) = (*this)[i] * a[j]; 
 		}
 	}
+#endif
 }
 
 void Vector::Mult(const Matrix& a, Vector& b) const {

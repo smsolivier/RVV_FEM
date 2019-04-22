@@ -4,6 +4,8 @@ using namespace std;
 using namespace fem; 
 
 int main() {
+	HWCounter hwc; 
+	hwc.Reset(); 
 	Vector v(10); 
 	v.SetSize(15); 
 	TEST(v[14] == 0, "resize"); 
@@ -36,14 +38,20 @@ int main() {
 	}
 	TEST(pass, "vector add"); 
 
-	b2 *= 2.; 
-	b2.Print(); 
+	a -= b2; 
 	for (int i=0; i<10; i++) {
-		if (fabs(b2[i] - 2.*i) > 1e-10) pass = false; 
+		if (fabs(a[i] - (i+1))>1e-10) pass = false; 
+	}
+	TEST(pass, "vector sub"); 
+
+	Vector b3(63); 
+	b3 = 1.; 
+	b3 *= 2.;  
+	for (int i=0; i<b3.GetSize(); i++) {
+		if (fabs(b3[i] - 2.) > 1e-10) pass = false; 
 	}
 	TEST(pass, "scale vector"); 
 
-#if 0
 	// test vector matrix mult 
 	Vector x(2); 
 	x[0] = 2.; 
@@ -72,5 +80,23 @@ int main() {
 	nor[1] = 0.; 
 	double dot = nor * omega; 
 	TEST(EQUAL(-1., dot), "dot product");
-#endif
+
+	// outer product 
+	Vector X(5); 
+	Vector Y(4); 
+	X[0] = 1.; 
+	X[4] = 3.; 
+	Y[1] = 2.; 
+	Y[3] = .5; 
+	Matrix OP(X.GetSize(), Y.GetSize()); 
+	X.OuterProduct(Y, OP); 
+	for (int i=0; i<X.GetSize(); i++) {
+		for (int j=0; j<Y.GetSize(); j++) {
+			if (fabs(OP(i,j)-X[i]*Y[j])>1e-10) pass = false; 
+		}
+	}
+	TEST(pass, "outer product"); 
+	hwc.Read(); 
+
+	cout << endl << "average VL = " << hwc.AvgVecLen() << endl; 
 }
