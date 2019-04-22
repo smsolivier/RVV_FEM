@@ -42,14 +42,14 @@ Vector Vector::operator*(double val) const {
 
 void Vector::operator*=(double val) {
 	CHECKMSG(GetSize() > 0, "vector not initialized"); 
-#ifdef USE_RISCV
-	VectorScale_RV(GetSize(), val, GetData()); 
-#else
+// #ifdef USE_RISCV
+	// VectorScale_RV(GetSize(), val, GetData()); 
+// #else
 	#pragma omp parallel for 
 	for (int i=0; i<GetSize(); i++) {
 		(*this)[i] *= val; 
 	}
-#endif
+// #endif
 }
 
 void Vector::operator+=(const Vector& a) {

@@ -6,8 +6,11 @@ import matplotlib.pyplot as plt
 import subprocess 
 import re 
 from collections import defaultdict
+import sys 
 
 exe = 'avl' 
+if (len(sys.argv)>1):
+	exe = sys.argv[1] 
 
 subprocess.run(['make', '-j', exe])
 
