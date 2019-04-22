@@ -13,6 +13,8 @@ extern "C" void VectorScale_RV(int N, double* a, double* alpha);
 // outer product 
 extern "C" void VectorOP_RV(int Na, int Nb, const double* a, 
 	const double* b, double* M); 
+// vector dot product 
+extern "C" void VectorDot_RV(int N, const double* a, const double* b, double* c); 
 
 namespace fem 
 {
@@ -63,7 +65,6 @@ void Vector::operator*=(double val) {
 
 void Vector::operator+=(const Vector& a) {
 	CHECK(a.GetSize() == GetSize()); 
-
 #ifdef USE_RISCV
 	VectorAdd_RV(GetSize(), GetData(), a.GetData()); 
 #else
@@ -159,14 +160,19 @@ void Vector::SquareRoot() {
 
 double Vector::Dot(const Vector& x) const {
 	CHECK(x.GetSize() == GetSize()); 
-
+// #ifdef USE_RISCV
+#if 0
+	double ret; 
+	VectorDot_RV(GetSize(), GetData(), x.GetData(), &ret); 
+	return ret; 
+#else
 	double sum = 0; 
 	// #pragma omp parallel for reduction(+:sum) 
 	for (int i=0; i<GetSize(); i++) {
 		sum += (*this)[i]*x[i]; 
 	}
-
 	return sum; 
+#endif
 }
 
 double Vector::L2Norm() const {
