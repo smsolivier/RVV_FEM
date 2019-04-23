@@ -56,6 +56,7 @@ void solve(int nref, int order, double& LinfE) {
 	hwc.Read(); 
 
 	cout << "average vl = " << hwc.AvgVecLen() << endl; 
+	cout << "elapsed cycles = " << hwc.Cycles() << endl; 
 
 	// Writer writer; 
 	// writer.Add(x, "u"); 

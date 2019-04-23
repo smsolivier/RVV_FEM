@@ -18,6 +18,8 @@ double Source(const Point& x) {
 }
 
 double ComputeError(int N, int p) {
+	HWCounter hwc; 
+	hwc.Reset(); 
 	CubeMesh mesh({N, N, N}); 
 	LagrangeSpace h1(mesh, p); 
 
@@ -37,11 +39,9 @@ double ComputeError(int N, int p) {
 
 	FunctionCoefficient ex(Exact); 
 	double err = x.L2Error(&ex); 
-
-	Writer writer; 
-	writer.Add(x, "x"); 
-	writer.Write(); 
-
+	hwc.Read(); 
+	cout << "avg vl = " << hwc.AvgVecLen() << endl; 
+	
 	return err; 
 }
 

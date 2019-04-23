@@ -142,7 +142,12 @@ double Matrix::Weight() const {
 void Matrix::Mult(const Matrix& a, Matrix& b) const {
 	CHECK(Width()==a.Height()); 
 	b.SetSize(Height(), a.Width()); 
+// #ifdef USE_RISCV
+#if 0 
+	MatMult_RV(Height(), Width(), GetData(), a.GetData(), b.GetData()); 
+#else
 	Mult(1., a, 0., b); 
+#endif
 }
 
 void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {

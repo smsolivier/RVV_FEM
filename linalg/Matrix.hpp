@@ -7,6 +7,8 @@
 #ifdef USE_RISCV
 // matrix vector product 
 extern "C" void MatVec_RV(int N, int M, const double* A, const double* x, double* b); 
+// dgemm: C = A*B 
+extern "C" void MatMult_RV(int N, int M, const double* A, const double* B, double* C); 
 #endif
 
 namespace fem 

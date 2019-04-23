@@ -13,6 +13,7 @@ void HWCounter::Reset() {
 
 	READ_CSR(hpmcounter3); 
 	READ_CSR(hpmcounter4); 
+	READ_CSR(cycle); 
 	#undef READ_CSR
 }
 
@@ -26,11 +27,16 @@ void HWCounter::Read() {
 
 	READ_CSR(hpmcounter3); 
 	READ_CSR(hpmcounter4); 
+	READ_CSR(cycle); 
 	#undef READ_CSR
 }
 
 double HWCounter::AvgVecLen() const {
 	return (double)_counters[0]/_counters[1];
+}
+
+int HWCounter::Cycles() const {
+	return _counters[2]; 
 }
 
 } // end namespace fem 
