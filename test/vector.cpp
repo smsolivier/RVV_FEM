@@ -3,6 +3,46 @@
 using namespace std; 
 using namespace fem; 
 
+bool AddFromDofs() {
+	Vector X(10); 
+	X[9] = 5; 
+	X[0] = 2; 
+	X[1] = 10; 
+	X[2] = 1; 
+	Array<int> dofs(3); 
+	dofs[0] = 9; 
+	dofs[1] = 0; 
+	dofs[2] = 2; 
+	Vector v(3); 
+	v[0] = 1; 
+	v[1] = 2; 
+	v[2] = 3; 
+	X.AddFromDofs(dofs, v); 
+	Vector ans(10); 
+	ans[0] = 4; 
+	ans[1] = 10; 
+	ans[2] = 4; 
+	ans[9] = 6; 
+	for (int i=0; i<10; i++) {
+		if (fabs(ans[i] - X[i]) > 1e-10) return false; 
+	}
+	return true; 
+}
+
+bool GetDofs() {
+	Vector X(10); 
+	for (int i=0; i<10; i++) {
+		X[i] = i; 
+	}
+	Array<int> dofs(3); 
+	dofs[0] = 5; 
+	dofs[1] = 2; 
+	dofs[2] = 8; 
+	Vector v(3); 
+	X.GetFromDofs(dofs, v); 
+	return EQUAL(v[0], 5) && EQUAL(v[1], 2) && EQUAL(v[2], 8); 
+}
+
 int main() {
 	HWCounter hwc; 
 	hwc.Reset(); 
@@ -96,7 +136,10 @@ int main() {
 		}
 	}
 	TEST(pass, "outer product"); 
-	hwc.Read(); 
 
+	TEST(AddFromDofs(), "add from dofs"); 
+	TEST(GetDofs(), "get from dofs"); 
+
+	hwc.Read(); 
 	cout << endl << "average VL = " << hwc.AvgVecLen() << endl; 
 }

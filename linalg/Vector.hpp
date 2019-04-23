@@ -24,6 +24,10 @@ extern "C" void VectorDot_RV(int N, const double* a, const double* b, double* c)
 extern "C" void VectorAdd2_RV(int N, const double* a, const double* b, double* c); 
 // c = a - b 
 extern "C" void VectorSub2_RV(int N, const double* a, const double* b, double* c); 
+// gather, add, and scatter 
+extern "C" void AddFromDofs_RV(int N, const int* dofs, const double* v, double* out);
+// gather 
+extern "C" void GetFromDofs_RV(int N, const int* dofs, double* v, const double* out); 
 #endif
 
 namespace fem 

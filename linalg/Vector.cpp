@@ -12,17 +12,27 @@ Vector::Vector(int size, double val) : Array<double>(size, val) {
 }
 
 void Vector::GetFromDofs(const Array<int>& dofs, Vector& v) const {
+	CH_TIMERS("get from dofs"); 
 	v.Resize(dofs.GetSize()); 
+#ifdef USE_RISCV
+	GetFromDofs_RV(dofs.GetSize(), dofs.GetData(), v.GetData(), GetData()); 
+#else
 	for (int i=0; i<dofs.GetSize(); i++) {
 		v[i] = (*this)[dofs[i]]; 
 	}
+#endif
 }
 
 void Vector::AddFromDofs(const Array<int>& dofs, Vector& v) {
+	CH_TIMERS("add from dofs"); 
 	CHECKMSG(dofs.GetSize()==v.GetSize() && v.GetSize()>0, "dofs and v sizes must agree"); 
+#ifdef USE_RISCV
+	AddFromDofs_RV(dofs.GetSize(), dofs.GetData(), v.GetData(), GetData()); 
+#else
 	for (int i=0; i<dofs.GetSize(); i++) {
 		(*this)[dofs[i]] += v[i]; 
 	}
+#endif
 }
 
 Vector Vector::operator*(double val) const {

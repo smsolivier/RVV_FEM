@@ -17,6 +17,7 @@ FESpace::~FESpace() {
 }
 
 void FESpace::GetVDofs(int e, Array<int>& vdofs) const {
+	CH_TIMERS("get vdofs"); 
 	Element& el = GetEl(e); 
 	vdofs.Resize(GetVDim() * el.GetNumNodes()); 
 	for (int d=0; d<GetVDim(); d++) {

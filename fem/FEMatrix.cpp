@@ -22,9 +22,9 @@ void FEMatrix::Mult(const Vector& x, Vector& b) const {
 	CH_TIMERS("FEMatrix mat vec"); 
 	if (b.GetSize() != Height()) b.SetSize(Height()); 
 
+	Array<int> vdofs; 
 	#pragma omp parallel for 
 	for (int e=0; e<_space->GetNumElements(); e++) {
-		Array<int> vdofs; 
 		Vector elvec; 
 		const Matrix& elmat = (*this)[e]; 
 		_space->GetVDofs(e, vdofs); 
