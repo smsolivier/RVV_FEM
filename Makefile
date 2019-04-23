@@ -19,12 +19,13 @@ BUILD = $(HOME)/build
 VPATH = $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
 vpath %.S $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
 
-VARS = -DTESTING -DUSE_WARNINGS 
+VARS = -DTESTING -DUSE_WARNINGS -DNDEBUG
 ifeq ($(CXX), g++) 
 	EXE = ./
 else 
-	VARS += -DUSE_RISCV -march=rv64gc
-	ASM = $(wildcard $(HOME)/linalg/*.S)
+	VARS += -DUSE_RISCV 
+	VARS += -march=rv64gc
+	ASM = $(wildcard $(HOME)/linalg/*.S $(HOME)/fem/*.S)
 	ASSEMBLER = $(ASM) -Wa,-march=rv64gcv
 	EXE = spike --isa=rv64gcv pk 
 endif 
@@ -50,6 +51,7 @@ OBJS = $(patsubst %.cpp,$(OBJ)/%.o,$(SRCFILES))
 DEPS = $(patsubst $(OBJ)/%.o,$(DEP)/%.d, $(OBJS))
 TESTS = $(basename $(wildcard $(HOME)/test/*.cpp))
 TESTOUT = $(addsuffix .out,$(TESTS)) 
+EXES = $(basename $(wildcard $(HOME)/exe/*.cpp)) 
 
 $(OBJ)/%.o : %.cpp $(HOME)/Makefile
 	mkdir -p $(OBJ)
@@ -57,7 +59,7 @@ $(OBJ)/%.o : %.cpp $(HOME)/Makefile
 	mkdir -p $(DEP)
 	$(CXX) -MM $(CFLAGS) $(LIBS) $< | sed -e '1s@^@$(OBJ)\/@' > $*.d; mv $*.d $(DEP)
 
-all : $(OBJS) 
+all : $(OBJS)
 tests : $(TESTS) 
 run : $(TESTOUT) 
 
@@ -70,6 +72,7 @@ clean:
 	rm -rf $(BUILD)
 	rm -f $(TESTS) 
 	rm -f $(TESTOUT) 
+	rm -f $(EXES) 
 
 listsrc : 
 	@echo $(SRCFILES) 

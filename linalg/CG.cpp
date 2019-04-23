@@ -5,6 +5,7 @@ namespace fem
 {
 
 void CG::Solve(Vector& rhs, Vector& x) {
+	CH_TIMERS("cg solve"); 
 	CHECK(rhs.GetSize() == _A->Height()); 
 
 	int N = _A->Height(); 

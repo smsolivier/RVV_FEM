@@ -26,6 +26,7 @@ void Vector::AddFromDofs(const Array<int>& dofs, Vector& v) {
 }
 
 Vector Vector::operator*(double val) const {
+	CH_TIMERS("vector operator*"); 
 	Vector ret(GetSize()); 
 
 	#pragma omp parallel for 
@@ -36,6 +37,7 @@ Vector Vector::operator*(double val) const {
 }
 
 void Vector::operator*=(double val) {
+	CH_TIMERS("vector operation *="); 
 	CHECKMSG(GetSize() > 0, "vector not initialized"); 
 #ifdef USE_RISCV
 	VectorScale_RV(GetSize(), GetData(), &val); 
@@ -48,6 +50,7 @@ void Vector::operator*=(double val) {
 }
 
 void Vector::operator+=(const Vector& a) {
+	CH_TIMERS("vector +="); 
 	CHECK(a.GetSize() == GetSize()); 
 #ifdef USE_RISCV
 	VectorAdd_RV(GetSize(), GetData(), a.GetData()); 
@@ -60,6 +63,7 @@ void Vector::operator+=(const Vector& a) {
 }
 
 void Vector::operator-=(const Vector& a) {
+	CH_TIMERS("vector -="); 
 	CHECK(a.GetSize() == GetSize()); 
 #ifdef USE_RISCV
 	VectorSub_RV(GetSize(), GetData(), a.GetData()); 
@@ -73,6 +77,7 @@ void Vector::operator-=(const Vector& a) {
 }
 
 void Vector::operator/=(const Vector& a) {
+	CH_TIMERS("vector /="); 
 	CHECK(a.GetSize() == GetSize()); 
 #ifdef USE_RISCV
 	VectorDiv_RV(GetSize(), GetData(), a.GetData()); 
@@ -85,6 +90,7 @@ void Vector::operator/=(const Vector& a) {
 }
 
 void Vector::operator*=(const Vector& a) {
+	CH_TIMERS("vector vector *="); 
 	CHECK(a.GetSize() == GetSize()); 
 #ifdef USE_RISCV
 	VectorMul_RV(GetSize(), GetData(), a.GetData()); 
@@ -97,6 +103,7 @@ void Vector::operator*=(const Vector& a) {
 }
 
 void Vector::OuterProduct(const Vector& a, Matrix& b) const {
+	CH_TIMERS("outer product"); 
 	if (b.Height() != GetSize() || b.Width() != a.GetSize()) {
 		b.SetSize(GetSize(), a.GetSize()); 		
 	}
@@ -143,6 +150,7 @@ void Vector::SquareRoot() {
 }
 
 double Vector::Dot(const Vector& x) const {
+	CH_TIMERS("vector dot product"); 
 	CHECK(x.GetSize() == GetSize()); 
 #ifdef USE_RISCV
 	double ret = 0; 
@@ -192,6 +200,7 @@ void Vector::Print(std::ostream& out, std::string end) const {
 }
 
 void Add(const Vector& a, const Vector& b, Vector& c) {
+	CH_TIMERS("vvadd"); 
 	CHECK(a.GetSize() == b.GetSize()); 
 	if (c.GetSize() != a.GetSize()) c.Resize(a.GetSize()); 
 #ifdef USE_RISCV
@@ -205,6 +214,7 @@ void Add(const Vector& a, const Vector& b, Vector& c) {
 }
 
 void Subtract(const Vector& a, const Vector& b, Vector& c) {
+	CH_TIMERS("vvsub"); 
 	CHECK(a.GetSize() == b.GetSize()); 
 	if (c.GetSize() != a.GetSize()) c.Resize(a.GetSize()); 
 #ifdef USE_RISCV
@@ -218,6 +228,7 @@ void Subtract(const Vector& a, const Vector& b, Vector& c) {
 }
 
 void Add(double alpha, const Vector& a, double beta, const Vector& b, Vector& c) {
+	CH_TIMERS("vvadd with coeffs"); 
 	CHECK(a.GetSize() == b.GetSize()); 
 	c.Resize(a.GetSize()); 
 

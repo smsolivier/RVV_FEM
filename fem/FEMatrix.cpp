@@ -19,6 +19,7 @@ FEMatrix::~FEMatrix() {
 }
 
 void FEMatrix::Mult(const Vector& x, Vector& b) const {
+	CH_TIMERS("FEMatrix mat vec"); 
 	if (b.GetSize() != Height()) b.SetSize(Height()); 
 
 	#pragma omp parallel for 

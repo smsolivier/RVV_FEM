@@ -1,4 +1,5 @@
 #include "HWCounter.hpp"
+#include "General.hpp"
 
 namespace fem
 {
@@ -32,6 +33,7 @@ void HWCounter::Read() {
 }
 
 double HWCounter::AvgVecLen() const {
+	if (_counters[1] == 0) return 0; 
 	return (double)_counters[0]/_counters[1];
 }
 

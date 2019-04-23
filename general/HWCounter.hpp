@@ -1,4 +1,5 @@
-#include "General.hpp"
+#pragma once 
+
 #include "Array.hpp"
 #include <array>
 

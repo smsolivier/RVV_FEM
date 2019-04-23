@@ -3,6 +3,11 @@
 #include <mpi.h>
 #endif
 
+#ifdef USE_RISCV
+extern "C" void CalcShape_RV(int N, int Nc, double* shape, double* x, 
+	const double* coef1, const double* coef2); 
+#endif
+
 using namespace std; 
 
 namespace fem 
@@ -26,6 +31,7 @@ bool InVector(const Array<int>& unique, int tag) {
 
 LagrangeSpace::LagrangeSpace(const Mesh& mesh, int order, int vdim) 
 	: FESpace(mesh, order, vdim) {
+	CH_TIMERS("setup lagrange space"); 
 
 	// create Elements for every mesh element 
 	for (int i=0; i<mesh.GetNumElements(); i++) {
@@ -263,9 +269,9 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 
 void LagrangeQuad::CalcShape(Point x, 
 	Vector& shape) const {
+	CH_TIMERS("lagrange quad calc shape"); 
 
 	shape.SetSize(GetNumNodes()); 
-
 	for (int i=0; i<_pp.GetSize(); i++) {
 		shape[i] = _pp[i](x); 
 	}
@@ -273,6 +279,7 @@ void LagrangeQuad::CalcShape(Point x,
 
 void LagrangeQuad::CalcGradShape(Point x, 
 	Matrix& gradshape) const {
+	CH_TIMERS("lagrange quad calc grad shape"); 
 
 	gradshape.SetSize(_mdim, GetNumNodes()); 
 	for (int i=0; i<_dpp.GetSize(); i++) {

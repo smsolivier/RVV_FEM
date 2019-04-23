@@ -68,6 +68,8 @@ public:
 		}
 		out << std::endl; 
 	}
+	const double* GetCoefs() const {return &_c[0]; }
+	int CoefSize() const {return _c.size(); }
 private:
 	/// coefficients of polynomial 
 	std::vector<double> _c; 
@@ -117,6 +119,7 @@ public:
 			grad[2] = PolyProduct(_poly[0], _poly[1], _poly[2].Derivative()); 
 		}
 	}
+	const Poly1D& Get1D(int d) const {return _poly[d]; }
 private:
 	/// store all polynomials 
 	Array<Poly1D> _poly; 

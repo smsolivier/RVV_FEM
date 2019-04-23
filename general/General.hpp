@@ -11,6 +11,7 @@
 #ifdef USE_MPI 
 #include <mpi.h>
 #endif
+#include "CH_Timer.hpp"
 
 #ifndef M_PI 
 #define M_PI (3.14159265358979323846) 

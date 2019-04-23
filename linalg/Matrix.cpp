@@ -62,6 +62,7 @@ void Matrix::SetSize(int m, int n) {
 }
 
 void Matrix::operator*=(double val) {
+	CH_TIMERS("matrix scale"); 
 #ifdef USE_RISCV
 	VectorScale_RV(Height()*Width(), GetData(), &val); 
 #else
@@ -72,6 +73,7 @@ void Matrix::operator*=(double val) {
 }
 
 void Matrix::operator+=(const Matrix& a) {
+	CH_TIMERS("matrix +="); 
 	CHECK(a.Height()==Height() && a.Width()==Width()); 
 #ifdef USE_RISCV
 	VectorAdd_RV(Height()*Width(), GetData(), a.GetData()); 
@@ -83,6 +85,7 @@ void Matrix::operator+=(const Matrix& a) {
 }
 
 void Matrix::operator-=(const Matrix& a) {
+	CH_TIMERS("matrix -="); 
 	CHECK(a.Height()==Height() && a.Width()==Width()); 
 #ifdef USE_RISCV
 	VectorSub_RV(Height()*Width(), GetData(), a.GetData()); 
@@ -102,6 +105,7 @@ void Matrix::AddMatrix(double a, const Matrix& mat, int row, int col) {
 }
 
 void Matrix::Inverse(Matrix& inv) const {
+	CH_TIMERS("matrix dense inverse"); 
 	if (Height()==2 && Width()==2) {
 		Inverse_2x2(inv); 
 	} else if (Height()==3 && Width() == 3) {
@@ -112,6 +116,7 @@ void Matrix::Inverse(Matrix& inv) const {
 }
 
 double Matrix::Determinant() const {
+	CH_TIMERS("matrix determinant"); 
 	if (Height()==2 && Width()==2) {
 		return (*this)(0,0)*(*this)(1,1) - (*this)(1,0)*(*this)(0,1); 
 	} else if (Height()==3 && Width()==3) {
@@ -151,6 +156,7 @@ void Matrix::Mult(const Matrix& a, Matrix& b) const {
 }
 
 void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {
+	CH_TIMERS("dgemm"); 
 	CHECK(Width() == B.Height()); 
 	CHECK(C.Height() == Height()); 
 	CHECK(C.Width() == B.Width()); 
@@ -179,6 +185,7 @@ void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {
 }
 
 void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
+	CH_TIMERS("add trans mult"); 
 	CHECK(Height()==a.Height()); 
 	CHECK(b.Width()==Width() && b.Height()==a.Width()); 
 
@@ -192,6 +199,7 @@ void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
 }
 
 void Matrix::Mult(const Vector& x, Vector& b) const {
+	CH_TIMERS("matvec"); 
 	CHECK(Width()==x.GetSize()); 
 	b.SetSize(Height()); 
 #ifdef USE_RISCV
@@ -202,6 +210,7 @@ void Matrix::Mult(const Vector& x, Vector& b) const {
 }
 
 void Matrix::Mult(double alpha, const Vector& x, double beta, Vector& b) const {
+	CH_TIMERS("matvec with coeffs"); 
 	CHECKMSG(x.GetSize() == Width(), "size mismatch"); 
 	CHECKMSG(b.GetSize() == Height(), "size mismatch"); 
 	for (int i=0; i<Height(); i++) {
@@ -243,6 +252,7 @@ void Matrix::GradToDiv(Vector& divshape) const {
 }
 
 void Matrix::Solve(const Vector& b, Vector& x) const {
+	CH_TIMERS("dense gauss elim"); 
 #ifdef USE_LAPACK
 	x = b; 
 
