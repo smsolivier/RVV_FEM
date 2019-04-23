@@ -18,6 +18,8 @@ double source(const Point& x) {
 }
 
 void solve(int nref, int order, double& LinfE) {
+	HWCounter hwc; 
+	hwc.Reset(); 
 	SquareMesh mesh(nref, nref, {0,0}, {1,1}); 
 	// dim = mesh.GetDim(); 
 
@@ -25,7 +27,7 @@ void solve(int nref, int order, double& LinfE) {
 	LagrangeSpace h1(mesh, order); 
 
 	// matrix builder 
-	LHS lhs(&h1); 
+	FEMatrix lhs(&h1); 
 	lhs.AddIntegrator(new WeakDiffusionIntegrator); 
 	lhs.AddIntegrator(new MassIntegrator); 
 
@@ -38,7 +40,7 @@ void solve(int nref, int order, double& LinfE) {
 	lhs.ApplyDirichletBoundary(rhs, 0.);
 
 	// test symmetry 
-	TEST(lhs.IsSymmetric(), "diffusion matrix symmetric"); 
+	// TEST(lhs.IsSymmetric(), "diffusion matrix symmetric"); 
 
 	GridFunction x(&h1); 
 	CG cg(&lhs, 1e-10, 1000); 
@@ -50,6 +52,10 @@ void solve(int nref, int order, double& LinfE) {
 
 	FunctionCoefficient ex(exact); 
 	LinfE = x.L2Error(&ex); 
+
+	hwc.Read(); 
+
+	cout << "average vl = " << hwc.AvgVecLen() << endl; 
 
 	// Writer writer; 
 	// writer.Add(x, "u"); 

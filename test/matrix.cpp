@@ -48,6 +48,28 @@ int main() {
 	m.Mult(x, mx); 
 	TEST(mx[0]==4 && mx[1]==6 && mx[2]==4, "matvec (3x3)"); 
 
+	Matrix M(10, 10); 
+	Vector XX(10); 
+	for (int i=0; i<M.Height(); i++) {
+		for (int j=0; j<M.Width(); j++) {
+			M(i,j) = (double)rand()/RAND_MAX; 
+		}
+		XX[i] = (double)rand()/RAND_MAX; 
+	}
+	Vector ans(10); 
+	for (int i=0; i<M.Height(); i++) {
+		ans[i] = 0.; 
+		for (int j=0; j<M.Width(); j++) {
+			ans[i] += M(i,j) * XX[j]; 
+		}
+	}
+	Vector b(10); 
+	M.Mult(XX, b); 
+	for (int i=0; i<M.Height(); i++) {
+		if (fabs(b[i] - ans[i])>1e-10) pass = false; 
+	}
+	TEST(pass, "matvec 10x10"); 
+
 	// test inverse 
 	Matrix a(2,2); 
 	a(0,0) = 2.; a(0,1) = 5.; a(1,1) = .5; 

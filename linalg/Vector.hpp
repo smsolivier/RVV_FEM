@@ -4,6 +4,28 @@
 #include "Matrix.hpp"
 #include "Array.hpp"
 
+#ifdef USE_RISCV 
+// a += b 
+extern "C" void VectorAdd_RV(int N, double* a, const double* b); 
+// a -= b 
+extern "C" void VectorSub_RV(int N, double* a, const double* b);
+// a /= b 
+extern "C" void VectorDiv_RV(int N, double* a, const double* b);  
+// a *= b 
+extern "C" void VectorMul_RV(int N, double* a, const double* b);  
+// v *= alpha 
+extern "C" void VectorScale_RV(int N, double* a, double* alpha); 
+// outer product 
+extern "C" void VectorOP_RV(int Na, int Nb, const double* a, 
+	const double* b, double* M); 
+// vector dot product 
+extern "C" void VectorDot_RV(int N, const double* a, const double* b, double* c); 
+// c = a + b 
+extern "C" void VectorAdd2_RV(int N, const double* a, const double* b, double* c); 
+// c = a - b 
+extern "C" void VectorSub2_RV(int N, const double* a, const double* b, double* c); 
+#endif
+
 namespace fem 
 {
 

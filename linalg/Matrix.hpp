@@ -4,6 +4,11 @@
 #include "Vector.hpp"
 #include "Array.hpp"
 
+#ifdef USE_RISCV
+// matrix vector product 
+extern "C" void MatVec_RV(int N, int M, const double* A, const double* x, double* b); 
+#endif
+
 namespace fem 
 {
 

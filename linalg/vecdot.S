@@ -20,7 +20,7 @@ VectorDot_RV:
     li a4, 1024                                                                                                       
     setvl(t0, a4)
     vinsert v3, x0, x0
-    # vadd v2, v3, v3 
+    vadd v2, v3, v3 
     setvcfg(vcfg0,
         VECTOR | FP | W64,                                                                      
         VECTOR | FP | W64,                                                                         
@@ -50,11 +50,11 @@ stripmine:
 reduction:
     srli a4, a4, 1     # Divide VL by 2
     vslide v1, v2, a4  # Slide the top half of the vector into v1
-#     setvl(a4, a4)
-#     vadd v2, v1, v2    # Do the add  
-#     bne a4, a5, reduction
+    setvl(a4, a4)
+    vadd v2, v1, v2    # Do the add  
+    bne a4, a5, reduction
 
-    # vld v1, 0(a3)      # VL == 1; Get the value stored at C
-    # vadd v2, v1, v2    # VL == 1; Add the initial value to the result of the ddot
-    # vst v2, 0(a3)      # VL == 1; Store the single element back to memory
+    vld v1, 0(a3)      # VL == 1; Get the value stored at C
+    vadd v2, v1, v2    # VL == 1; Add the initial value to the result of the ddot
+    vst v2, 0(a3)      # VL == 1; Store the single element back to memory
 ret

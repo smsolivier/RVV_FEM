@@ -1,21 +1,5 @@
 #include "Vector.hpp"
 
-// a += b 
-extern "C" void VectorAdd_RV(int N, double* a, const double* b); 
-// a -= b 
-extern "C" void VectorSub_RV(int N, double* a, const double* b);
-// a /= b 
-extern "C" void VectorDiv_RV(int N, double* a, const double* b);  
-// a *= b 
-extern "C" void VectorMul_RV(int N, double* a, const double* b);  
-// v *= alpha 
-extern "C" void VectorScale_RV(int N, double* a, double* alpha); 
-// outer product 
-extern "C" void VectorOP_RV(int Na, int Nb, const double* a, 
-	const double* b, double* M); 
-// vector dot product 
-extern "C" void VectorDot_RV(int N, const double* a, const double* b, double* c); 
-
 namespace fem 
 {
 
@@ -160,9 +144,8 @@ void Vector::SquareRoot() {
 
 double Vector::Dot(const Vector& x) const {
 	CHECK(x.GetSize() == GetSize()); 
-// #ifdef USE_RISCV
-#if 0
-	double ret; 
+#ifdef USE_RISCV
+	double ret = 0; 
 	VectorDot_RV(GetSize(), GetData(), x.GetData(), &ret); 
 	return ret; 
 #else
@@ -211,21 +194,27 @@ void Vector::Print(std::ostream& out, std::string end) const {
 void Add(const Vector& a, const Vector& b, Vector& c) {
 	CHECK(a.GetSize() == b.GetSize()); 
 	if (c.GetSize() != a.GetSize()) c.Resize(a.GetSize()); 
-
+#ifdef USE_RISCV
+	VectorAdd2_RV(a.GetSize(), a.GetData(), b.GetData(), c.GetData()); 
+#else
 	#pragma omp parallel for 
 	for (int i=0; i<a.GetSize(); i++) {
 		c[i] = a[i] + b[i]; 
 	}
+#endif
 }
 
 void Subtract(const Vector& a, const Vector& b, Vector& c) {
 	CHECK(a.GetSize() == b.GetSize()); 
 	if (c.GetSize() != a.GetSize()) c.Resize(a.GetSize()); 
-
+#ifdef USE_RISCV
+	VectorSub2_RV(a.GetSize(), a.GetData(), b.GetData(), c.GetData()); 
+#else
 	#pragma omp parallel for 
 	for (int i=0; i<a.GetSize(); i++) {
 		c[i] = a[i] - b[i]; 
 	}
+#endif
 }
 
 void Add(double alpha, const Vector& a, double beta, const Vector& b, Vector& c) {

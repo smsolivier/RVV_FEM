@@ -1,9 +1,5 @@
 #include "Matrix.hpp"
 
-#ifdef USE_RISCV 
-extern "C" void MatVec_RV(int N, int M, const double* A, const double* x, double* b); 
-#endif
-
 using namespace std; 
 
 namespace fem 
@@ -66,25 +62,35 @@ void Matrix::SetSize(int m, int n) {
 }
 
 void Matrix::operator*=(double val) {
+#ifdef USE_RISCV
+	VectorScale_RV(Height()*Width(), GetData(), &val); 
+#else
 	for (int i=0; i<_m*_n; i++) {
 		(*this)[i] *= val; 
 	}
+#endif
 }
 
 void Matrix::operator+=(const Matrix& a) {
 	CHECK(a.Height()==Height() && a.Width()==Width()); 
-
+#ifdef USE_RISCV
+	VectorAdd_RV(Height()*Width(), GetData(), a.GetData()); 
+#else
 	for (int i=0; i<_m*_n; i++) {
 		(*this)[i] += a.GetData()[i]; 
 	}
+#endif
 }
 
 void Matrix::operator-=(const Matrix& a) {
 	CHECK(a.Height()==Height() && a.Width()==Width()); 
-
+#ifdef USE_RISCV
+	VectorSub_RV(Height()*Width(), GetData(), a.GetData()); 
+#else
 	for (int i=0; i<_m*_n; i++) {
 		(*this)[i] -= a.GetData()[i]; 
 	}
+#endif
 }
 
 void Matrix::AddMatrix(double a, const Matrix& mat, int row, int col) {
@@ -183,24 +189,22 @@ void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
 void Matrix::Mult(const Vector& x, Vector& b) const {
 	CHECK(Width()==x.GetSize()); 
 	b.SetSize(Height()); 
-
+#ifdef USE_RISCV
+	MatVec_RV(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
+#else
 	Mult(1., x, 0., b); 
+#endif
 }
 
 void Matrix::Mult(double alpha, const Vector& x, double beta, Vector& b) const {
 	CHECKMSG(x.GetSize() == Width(), "size mismatch"); 
 	CHECKMSG(b.GetSize() == Height(), "size mismatch"); 
-
-#ifdef USE_RISCV 
-	MatVec_RV(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
-#else
 	for (int i=0; i<Height(); i++) {
 		b[i] = beta * b[i]; 
 		for (int j=0; j<Width(); j++) {
 			b[i] += alpha*(*this)(i,j) * x[j]; 
 		}
 	}
-#endif
 }
 
 bool Matrix::IsSymmetric() const {
