@@ -38,13 +38,16 @@ void solve(int nref, int order) {
 	// apply the boundary conditions
 	lhs.ApplyDirichletBoundary(rhs, 0.);
 
+	HWCounter hwc2; 
+	hwc2.Reset(); 
 	GridFunction x(&h1); 
 	CG cg(&lhs, 1e-10, 1000); 
 	cg.Solve(rhs, x); 
 	hwc.Read(); 
+	hwc2.Read(); 
 
-	cout << "average vl = " << hwc.AvgVecLen() << endl; 
-	cout << "q = " << hwc.GetQ() << endl; 
+	hwc2.PrintStats("cg solve"); 
+	hwc.PrintStats(); 
 }
 
 int main(int argc, char* argv[]) {

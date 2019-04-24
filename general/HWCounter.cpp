@@ -1,6 +1,8 @@
 #include "HWCounter.hpp"
 #include "General.hpp"
 
+using namespace std; 
+
 #define READ_ALL() \
 	READ_CSR(hpmcounter3); \
 	READ_CSR(hpmcounter4); \
@@ -36,16 +38,27 @@ void HWCounter::Read() {
 }
 
 double HWCounter::AvgVecLen() const {
-	if (_counters[1] == 0) return 0; 
-	return (double)_counters[0]/_counters[1];
+	if (_counters[HPMType::v_instr] == 0) return 0; 
+	return (double)_counters[HPMType::vl_sum]/_counters[HPMType::v_instr];
 }
 
 int HWCounter::Cycles() const {
-	return _counters[2]; 
+	return _counters[HPMType::cycles]; 
 }
 
 double HWCounter::GetQ() const {
-	return (double)_counters[3]/_counters[4]; 
+	return (double)_counters[HPMType::flops]/_counters[HPMType::fmem]; 
+}
+
+double HWCounter::FlopsPerCycle() const {
+	return (double)_counters[HPMType::flops]/_counters[HPMType::cycles]; 
+}
+
+void HWCounter::PrintStats(string name) const {
+	cout << name << " stats:" << endl; 
+	cout << "\taverage vl = " << AvgVecLen() << endl; 
+	cout << "\tq = " << GetQ() << endl; 
+	cout << "\tflops / cycle = " << FlopsPerCycle() << endl; 
 }
 
 } // end namespace fem 

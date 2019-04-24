@@ -20,6 +20,8 @@ VPATH = $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH)
 vpath %.S $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
 
 VARS = -DTESTING -DUSE_WARNINGS
+VARS += -DNDEBUG
+VARS += -DCH_NTIMER 
 ifeq ($(CXX), g++) 
 	EXE = ./
 	VARS += -DUSE_UNWIND
@@ -32,7 +34,7 @@ else
 	EXE = spike --isa=rv64gcv pk 
 endif 
 
-OPT = -O3 -ffast-math
+OPT = -O2 -ffast-math
 # OPT = -g 
 
 # # where to look for header files 

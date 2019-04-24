@@ -8,6 +8,14 @@
 namespace fem 
 {
 
+enum HPMType {
+	vl_sum,
+	v_instr, 
+	cycles,
+	fmem, 
+	flops
+}; 
+
 /// class for reading hardware counters 
 class HWCounter {
 public:
@@ -24,6 +32,10 @@ public:
 	int Cycles() const; 
 	/// get arithmetic intensity 
 	double GetQ() const; 
+	/// return flops per cycle 
+	double FlopsPerCycle() const; 
+
+	void PrintStats(std::string name="main") const; 
 private:
 	std::array<uint64_t,NUMCOUNTERS> _counters; 
 }; 
