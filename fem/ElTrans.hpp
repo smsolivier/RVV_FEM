@@ -61,6 +61,8 @@ private:
 	Point _x; 
 	/// true if evaluation point has been set 
 	bool _x_set; 
+	/// true if jacobian has been computed 
+	bool _bjac; 
 	/// store grad shape 
 	Matrix _gshape; 
 	/// store shape 
@@ -69,12 +71,18 @@ private:
 	Matrix _J; 
 	/// store inverse jacobian for reuse 
 	Matrix _Jinv; 
+	/// true if Jinv has been computed 
+	bool _bJinv; 
 	/// dimensionality of element shape 
 	int _dim; 
 	/// dimensionality of mesh 
 	int _mdim; 
 	/// (dim x NumNodes) matrix of point values in physical space 
-	Matrix _points; 
+	Matrix _points;
+	/// store the determinant of the jacobian  
+	double _Jdet; 
+	/// true if determinant has been calculated 
+	bool _bJdet; 
 }; 
 
 } // end namespace fem 

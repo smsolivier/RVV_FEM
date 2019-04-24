@@ -3,7 +3,7 @@
 #include "Array.hpp"
 #include <array>
 
-#define NUMCOUNTERS 3
+#define NUMCOUNTERS 5
 
 namespace fem 
 {
@@ -22,6 +22,8 @@ public:
 	double AvgVecLen() const; 
 	/// get elapsed cycles 
 	int Cycles() const; 
+	/// get arithmetic intensity 
+	double GetQ() const; 
 private:
 	std::array<uint64_t,NUMCOUNTERS> _counters; 
 }; 

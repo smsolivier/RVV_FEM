@@ -45,7 +45,8 @@ void CG::Solve(Vector& rhs, Vector& x) {
 		alpha /= denom; 
 
 		// x = x + s*alpha 
-		Add(x, s*alpha, x); 
+		s *= alpha; 
+		Add(x, s, x); 
 
 		// r = rhs - A*x 
 		Ax = 0.; 
@@ -57,7 +58,8 @@ void CG::Solve(Vector& rhs, Vector& x) {
 		beta *= -1./denom; 
 
 		// s = r + s*beta 
-		Add(r, s*beta, s); 
+		s *= beta/alpha; 
+		Add(r, s, s); 
 
 		// compute L2 norm of r 
 		norm = r.L2Norm(); 

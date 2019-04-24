@@ -1,6 +1,13 @@
 #include "HWCounter.hpp"
 #include "General.hpp"
 
+#define READ_ALL() \
+	READ_CSR(hpmcounter3); \
+	READ_CSR(hpmcounter4); \
+	READ_CSR(cycle);\
+	READ_CSR(hpmcounter5); \
+	READ_CSR(hpmcounter6); 
+
 namespace fem
 {
 
@@ -12,9 +19,7 @@ void HWCounter::Reset() {
 		i++; \
 	}
 
-	READ_CSR(hpmcounter3); 
-	READ_CSR(hpmcounter4); 
-	READ_CSR(cycle); 
+	READ_ALL(); 
 	#undef READ_CSR
 }
 
@@ -26,9 +31,7 @@ void HWCounter::Read() {
 		i++; \
 	}
 
-	READ_CSR(hpmcounter3); 
-	READ_CSR(hpmcounter4); 
-	READ_CSR(cycle); 
+	READ_ALL(); 
 	#undef READ_CSR
 }
 
@@ -39,6 +42,10 @@ double HWCounter::AvgVecLen() const {
 
 int HWCounter::Cycles() const {
 	return _counters[2]; 
+}
+
+double HWCounter::GetQ() const {
+	return (double)_counters[3]/_counters[4]; 
 }
 
 } // end namespace fem 

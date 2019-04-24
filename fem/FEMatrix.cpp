@@ -23,15 +23,14 @@ void FEMatrix::Mult(const Vector& x, Vector& b) const {
 	if (b.GetSize() != Height()) b.SetSize(Height()); 
 
 	Array<int> vdofs; 
-	#pragma omp parallel for 
-	for (int e=0; e<_space->GetNumElements(); e++) {
-		Vector elvec; 
+	Vector elvec; 
+	Vector prod; 
+	int Ne = _space->GetNumElements(); 
+	for (int e=0; e<Ne; e++) {
 		const Matrix& elmat = (*this)[e]; 
-		_space->GetVDofs(e, vdofs); 
+		vdofs = _space->GetVDofs(e);  
 		x.GetFromDofs(vdofs, elvec); 
-		Vector prod; 
 		elmat.Mult(elvec, prod); 
-		#pragma omp critical 
 		b.AddFromDofs(vdofs, prod); 
 	}
 }

@@ -142,4 +142,5 @@ int main() {
 
 	hwc.Read(); 
 	cout << endl << "average VL = " << hwc.AvgVecLen() << endl; 
+	cout << "q = " << hwc.GetQ() << endl; 
 }

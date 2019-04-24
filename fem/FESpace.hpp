@@ -29,6 +29,8 @@ public:
 		\param[out] vdofs Array of global indices (includes vector unknowns)
 	*/ 
 	void GetVDofs(int el, Array<int>& vdofs) const; 
+	/// get vdofs as reference to the array (hopefully faster?) 
+	const Array<int>& GetVDofs(int el) const; 
 	/// return the number of boundary nodes 
 	int GetNBN() const {return _bnodes.GetSize(); }
 	/// return the number of elements 
@@ -80,6 +82,8 @@ protected:
 	int _vdim; 
 	/// number of unique tags 
 	Array<int> _unique_tags; 
+	/// store the degrees of freedom corresponding to each element 
+	Array<Array<int>> _vdofs; 
 }; 
 
 } // end namespace fem 

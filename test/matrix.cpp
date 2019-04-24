@@ -4,6 +4,8 @@ using namespace std;
 using namespace fem; 
 
 int main() {
+	HWCounter hwc; 
+	hwc.Reset(); 
 	int N = 50; 
 	Matrix mat(N); 
 	mat = 10; 
@@ -140,4 +142,9 @@ int main() {
 		}
 	}
 	TEST(C2 == C, "blas dgemm"); 
+
+	hwc.Read(); 
+
+	cout << endl << "avl = " << hwc.AvgVecLen() << endl; 
+	cout << "q = " << hwc.GetQ() << endl; 
 }

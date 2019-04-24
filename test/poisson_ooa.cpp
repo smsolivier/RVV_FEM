@@ -55,7 +55,7 @@ void solve(int nref, int order, double& LinfE) {
 
 	hwc.Read(); 
 
-	cout << "average vl = " << hwc.AvgVecLen() << endl; 
+	cout << "average vl = " << hwc.AvgVecLen() << ", q = " << hwc.GetQ() << endl; 
 }
 
 int main(int argc, char* argv[]) {

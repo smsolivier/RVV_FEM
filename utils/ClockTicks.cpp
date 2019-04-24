@@ -1,6 +1,7 @@
 #include "ClockTicks.hpp"
 #include "General.hpp"
 
+#ifdef __riscv 
 uint64_t CH_pticks; 
 unsigned long long int ch_ticks()
 {
@@ -11,8 +12,10 @@ unsigned long long int ch_ticks()
   return ticks;  
 }
 
-uint64_t CH_vl; 
-uint64_t CH_vi; 
+uint64_t CH_vl = 0; 
+uint64_t CH_vi = 0; 
+uint64_t CH_flops = 0; 
+uint64_t CH_mem = 0; 
 double ch_avl() {
 	uint64_t vl = read_csr(hpmcounter3); 
 	uint64_t vi = read_csr(hpmcounter4); 
@@ -24,3 +27,18 @@ double ch_avl() {
 	if (vie == 0) return 0; 
 	return (double)vle/vie; 
 }
+
+double ch_q() {
+	uint64_t mem = read_csr(hpmcounter5); 
+	uint64_t flops = read_csr(hpmcounter6); 
+	uint64_t meme = mem - CH_mem; 
+	uint64_t flopse = flops - CH_flops; 
+	CH_mem = mem; 
+	CH_flops = flops; 
+	if (flopse==0 or meme==0) return 0; 
+	return (double)flopse/meme; 
+}
+#else 
+double ch_avl() {return 0; }
+double ch_q() {return 0.; }
+#endif

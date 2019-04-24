@@ -174,8 +174,11 @@ int TraceTimer::initializer()
   s_currentTimer.resize(1);
   s_currentTimer[0]=rootTimer;
 
-  // char* timerEnv = getenv("CH_TIMER");
+#ifdef __riscv
   char* timerEnv = "1"; 
+#else
+  char* timerEnv = getenv("CH_TIMER");
+#endif
   if(timerEnv == NULL)
     {
       rootTimer->m_pruned = true;
@@ -323,9 +326,11 @@ void TraceTimer::report(bool a_closeAfter)
 
 #ifndef CH_NTIMER
 
-
-  // char* timerEnv = getenv("CH_TIMER");
+#ifdef __riscv
   char* timerEnv = "1"; 
+#else
+  char* timerEnv = getenv("CH_TIMER");
+#endif
   if(timerEnv == NULL)
     {
       // pout()<<"CH_TIMER environment variable not set. Timers inactive. Not writing time.table \n";
@@ -384,8 +389,11 @@ void TraceTimer::report(bool a_closeAfter)
 
 void TraceTimer::reset()
 {
-  // char* timerEnv = getenv("CH_TIMER");
+#ifdef __riscv
   char* timerEnv = "1"; 
+#else
+  char* timerEnv = getenv("CH_TIMER");
+#endif
   if(timerEnv == NULL)
     {
       // pout()<<"CH_TIMER environment variable not set. Timers inactive. Not writing time.table \n";
@@ -401,6 +409,7 @@ void TraceTimer::reset(TraceTimer& node)
   node.m_count = 0;
   node.m_accumulated_WCtime = 0;
   node.m_avl = 0; 
+  node.m_q = 0; 
   node.m_memory = 0;
   for(unsigned int i=0; i<node.m_children.size(); i++)
     {
@@ -465,7 +474,8 @@ void TraceTimer::reportFullTree(FILE* out, const TraceTimer& timer,
   if(depth < 20){
     for(int i=0; i<depth; ++i) fprintf(out,"   ");
     double percent = ((double)time)/totalTime * 100.0;
-    fprintf(out, "[%d] %s %.0f %4.1f%% %lld (%.2f) \n", timer.m_rank, timer.m_name, time*secondspertick, percent, timer.m_count, timer.m_avl/timer.m_count);
+    fprintf(out, "[%d] %s %.0f %4.1f%% %lld (%.2f, %.2f) \n", timer.m_rank, timer.m_name, time*secondspertick, 
+      percent, timer.m_count, timer.m_avl/timer.m_count, timer.m_q/timer.m_count);
   }
   std::vector<int> ordering;
   sorterHelper(timer.m_children, ordering);
@@ -479,10 +489,12 @@ void TraceTimer::reportOneTree(FILE* out, const TraceTimer& timer)
   if(timer.m_pruned) return;
   unsigned long long int time = timer.m_accumulated_WCtime;
   unsigned long long int subTime = 0;
+  double subq = 0; 
 
   fprintf(out,"---------------------------------------------------------\n");
 
-  fprintf(out,"[%d]%s %.0f %lld (%.2f)\n", timer.m_rank, timer.m_name, time*secondspertick, timer.m_count, timer.m_avl/timer.m_count);
+  fprintf(out,"[%d]%s %.0f %lld (%.2f, %.2f)\n", timer.m_rank, timer.m_name, time*secondspertick, 
+    timer.m_count, timer.m_avl/timer.m_count, timer.m_q/timer.m_count);
   const std::vector<TraceTimer*>& children = timer.m_children;
   std::vector<int> ordering;
   sorterHelper(children, ordering);
@@ -495,8 +507,9 @@ void TraceTimer::reportOneTree(FILE* out, const TraceTimer& timer)
           if(childtime > 0){
             subTime += childtime;
             double percent = ((double)childtime) / time * 100.0;
-            fprintf(out,"    %4.1f%% %7.0f %8lld %s (%.2f) [%d]\n",
-                    percent, childtime*secondspertick, child.m_count, child.m_name, child.m_avl/child.m_count, child.m_rank);
+            fprintf(out,"    %4.1f%% %7.0f %8lld %s (%.2f, %.2f) [%d]\n",
+                    percent, childtime*secondspertick, child.m_count, child.m_name, 
+                    child.m_avl/child.m_count, child.m_q/child.m_count, child.m_rank);
           }
         } else {
          fprintf(out,"           pruned           \n");
@@ -593,7 +606,7 @@ TraceTimer* TraceTimer::getTimer(const char* name)
 TraceTimer::TraceTimer(const char* a_name, TraceTimer* parent, int thread_id)
   :m_pruned(false), m_parent(parent), m_name(a_name), m_count(0),
    m_accumulated_WCtime(0),m_last_WCtime_stamp(0), m_thread_id(thread_id),
-   m_memory(0), m_peak(0), m_avl(0)
+   m_memory(0), m_peak(0), m_avl(0), m_q(0)
 {
 
 }
@@ -650,6 +663,7 @@ unsigned long long int TraceTimer::stop(char* mutex)
   if(diff > overflowLong) diff = 0;
   m_accumulated_WCtime += diff;
   m_avl += ch_avl(); 
+  m_q += ch_q(); 
 #ifdef  CH_USE_MEMORY_TRACKING
   if(s_traceMemory)
     {
@@ -723,8 +737,11 @@ void TraceTimer::PruneTimersParentChildPercent(double threshold, TraceTimer* par
 void TraceTimer::PruneTimersParentChildPercent(double percent)
 {
 #ifndef CH_NTIMER
-  // char* timerEnv = getenv("CH_TIMER");
+#ifdef __riscv
   char* timerEnv = "1"; 
+#else
+  char* timerEnv = getenv("CH_TIMER");
+#endif
   if(timerEnv == NULL)
     {
       // pout()<<"CH_TIMER environment variable not set. Timers inactive. Not writing time.table \n";

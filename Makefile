@@ -19,9 +19,11 @@ BUILD = $(HOME)/build
 VPATH = $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
 vpath %.S $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
 
-VARS = -DTESTING -DUSE_WARNINGS -DNDEBUG
+VARS = -DTESTING -DUSE_WARNINGS
 ifeq ($(CXX), g++) 
 	EXE = ./
+	VARS += -DUSE_UNWIND
+	LIBS += -lunwind -ldl 
 else 
 	VARS += -DUSE_RISCV 
 	VARS += -march=rv64gc

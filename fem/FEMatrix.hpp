@@ -28,7 +28,10 @@ public:
 	/// access elemental matrices 
 	Matrix& operator[](int el) {return *_data[el]; }
 	/// const access to elemental matrices 
-	const Matrix& operator[](int el) const {return *_data[el]; }
+	const Matrix& operator[](int el) const {
+		CH_TIMERS("get el matrix"); 
+		return *_data[el]; 
+	}
 	/// add a bilinear integrator 
 	void AddIntegrator(BilinearIntegrator* integ); 
 	/// apply dirichlet boundary conditions 

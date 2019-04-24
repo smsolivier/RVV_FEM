@@ -35,17 +35,6 @@ void Vector::AddFromDofs(const Array<int>& dofs, Vector& v) {
 #endif
 }
 
-Vector Vector::operator*(double val) const {
-	CH_TIMERS("vector operator*"); 
-	Vector ret(GetSize()); 
-
-	#pragma omp parallel for 
-	for (int i=0; i<GetSize(); i++) {
-		ret[i] = (*this)[i]*val; 
-	}
-	return ret; 
-}
-
 void Vector::operator*=(double val) {
 	CH_TIMERS("vector operation *="); 
 	CHECKMSG(GetSize() > 0, "vector not initialized"); 
@@ -170,7 +159,7 @@ double Vector::Dot(const Vector& x) const {
 	double sum = 0; 
 	// #pragma omp parallel for reduction(+:sum) 
 	for (int i=0; i<GetSize(); i++) {
-		sum += (*this)[i]*x[i]; 
+		sum += this->operator[](i)*x[i]; 
 	}
 	return sum; 
 #endif

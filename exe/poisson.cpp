@@ -44,6 +44,7 @@ void solve(int nref, int order) {
 	hwc.Read(); 
 
 	cout << "average vl = " << hwc.AvgVecLen() << endl; 
+	cout << "q = " << hwc.GetQ() << endl; 
 }
 
 int main(int argc, char* argv[]) {

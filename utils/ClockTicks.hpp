@@ -70,6 +70,7 @@ unsigned long long int ch_ticks();
 #endif
 
 double ch_avl(); 
+double ch_q(); 
 
 
 #endif

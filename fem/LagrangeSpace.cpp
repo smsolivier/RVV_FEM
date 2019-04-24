@@ -94,6 +94,16 @@ LagrangeSpace::LagrangeSpace(const Mesh& mesh, int order, int vdim)
 			_bnodes.Append(_nodes[i]); 
 		}
 	}
+	_vdofs.Resize(GetNumElements()); 
+	for (int e=0; e<GetNumElements(); e++) {
+		Element& el = GetEl(e); 
+		_vdofs[e].Resize(GetVDim() * el.GetNumNodes()); 
+		for (int d=0; d<GetVDim(); d++) {
+			for (int i=0; i<el.GetNumNodes(); i++) {
+				_vdofs[e][el.GetNumNodes()*d+i] = GetVDim()*el.GetNodeGlobalID(i) + d; 
+			}
+		}
+	}
 }
 
 LagrangeLine::LagrangeLine(Array<MeshNode> node_list, int order, int mdim) 

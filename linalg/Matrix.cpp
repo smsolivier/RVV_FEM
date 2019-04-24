@@ -199,12 +199,13 @@ void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
 }
 
 void Matrix::Mult(const Vector& x, Vector& b) const {
-	CH_TIMERS("matvec"); 
 	CHECK(Width()==x.GetSize()); 
-	b.SetSize(Height()); 
+	if (b.GetSize()!=Height()) b.SetSize(Height()); 
 #ifdef USE_RISCV
+	CH_TIMERS("matvec RV"); 
 	MatVec_RV(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
 #else
+	CH_TIMERS("matvec"); 
 	Mult(1., x, 0., b); 
 #endif
 }

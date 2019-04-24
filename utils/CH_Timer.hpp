@@ -224,6 +224,7 @@
     unsigned long long int      m_accumulated_WCtime;
     unsigned long long int      m_last_WCtime_stamp;
     double             m_avl; 
+    double             m_q; 
     uint64_t           m_calls; 
     mutable int        m_rank;
     int                m_thread_id;

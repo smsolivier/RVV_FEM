@@ -18,14 +18,12 @@ FESpace::~FESpace() {
 
 void FESpace::GetVDofs(int e, Array<int>& vdofs) const {
 	CH_TIMERS("get vdofs"); 
-	Element& el = GetEl(e); 
-	vdofs.Resize(GetVDim() * el.GetNumNodes()); 
-	for (int d=0; d<GetVDim(); d++) {
-		for (int i=0; i<el.GetNumNodes(); i++) {
-			// vdofs[el.GetNumNodes()*d + i] = d*GetNumNodes() + el.GetNodeGlobalID(i); 
-			vdofs[el.GetNumNodes()*d+i] = GetVDim()*el.GetNodeGlobalID(i) + d; 
-		}
-	}
+	vdofs = _vdofs[e]; 
+}
+
+const Array<int>& FESpace::GetVDofs(int e) const {
+	CH_TIMERS("get vdofs reference"); 
+	return _vdofs[e]; 
 }
 
 FESpace::FESpace(const Mesh& mesh, int order, int vdim) : _mesh(mesh), _order(order) {
