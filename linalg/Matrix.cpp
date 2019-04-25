@@ -387,7 +387,7 @@ int Matrix::GaussElim(int dim, Vector& x, const Vector& b) const
     for(int k = 0; k < dim; k++) {
         double aSubK = a(k,k);
         double bSubK = x[k];
-        if(aSubK == 0.0) {              /* check */
+        if(aSubK == 0.0) { 
             //fprintf(stderr, "gauss: a[%d][%d] = 0\n", k, k);
             //cout << "gauss: a[" << k << "][" << k << "] = 0\n";
             //exit(1);
@@ -397,12 +397,12 @@ int Matrix::GaussElim(int dim, Vector& x, const Vector& b) const
         for(int i = k+1; i <= mGaussLastCol[k]; i++) {
             double xtemp = a(i,k);
             if(xtemp == 0.0) continue;
-            a(i,k) = 0.0;                      /* eq (4.1a) */
+            a(i,k) = 0.0;                   
             xtemp /= aSubK;
             for(int j = k+1; j <= mGaussLastRow[k]; j++) {
                 a(i,j) -= a(k,j)*xtemp;
             }
-            x[i] -= bSubK*xtemp;              /* eq (4.1c) */
+            x[i] -= bSubK*xtemp;           
         }
     }
  
