@@ -1,6 +1,5 @@
 #pragma once 
 
-#include "Array.hpp"
 #include <array>
 
 #define NUMCOUNTERS 5
@@ -26,11 +25,11 @@ public:
 	/// get current values 
 	void Read(); 
 
-	/// get average vector length 
+	/// return average vector length 
 	double AvgVecLen() const; 
-	/// get elapsed cycles 
+	/// return elapsed cycles 
 	int Cycles() const; 
-	/// get arithmetic intensity 
+	/// return arithmetic intensity 
 	double GetQ() const; 
 	/// return flops per cycle 
 	double FlopsPerCycle() const; 

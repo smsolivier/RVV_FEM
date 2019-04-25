@@ -23,14 +23,6 @@
 #define INTEGRATION_ORDER 3
 #define INTEGRATION_TYPE 0
 
-#ifdef __riscv
-#define read_csr(reg) ({ unsigned long __tmp; \
-  asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
-  __tmp; })
-#else 
-#define read_csr(reg) 0; 
-#endif 
-
 // exit with error and backtracing 
 #define EXIT {\
 	std::cout << "encountered FATAL ERROR... aborting" << std::endl; \

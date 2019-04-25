@@ -20,6 +20,8 @@
 #include "mpi.h"
 #endif
 
+#include "HWCounter.hpp"
+
 
   /** TraceTimer class is a self-tracing code instrumentation system
 
@@ -215,6 +217,7 @@
     static bool s_traceMemory;
     static long long int s_peak;
     static TraceTimer*   s_peakTimer;
+    fem::HWCounter       m_hwc; 
 
     bool               m_pruned;
     TraceTimer*        m_parent;
@@ -223,9 +226,10 @@
     long long int      m_count;
     unsigned long long int      m_accumulated_WCtime;
     unsigned long long int      m_last_WCtime_stamp;
-    double             m_avl; 
+    double             m_avl;
+    double             m_avlp;  
     double             m_q; 
-    uint64_t           m_calls; 
+    double             m_qp; 
     mutable int        m_rank;
     int                m_thread_id;
     long long int      m_memory;
@@ -317,9 +321,14 @@ inline void TraceTimer::leafStart()
 
 inline void TraceTimer::leafStop()
 {
+  m_hwc.Read(); 
   if(m_pruned) return;
   m_accumulated_WCtime +=  ch_ticks() - m_last_WCtime_stamp;
   m_last_WCtime_stamp=0;
+
+  m_q += m_hwc.GetQ(); 
+  m_avl += m_hwc.AvgVecLen(); 
+  m_hwc.Reset(); 
 }
 
 #ifdef CH_NTIMER

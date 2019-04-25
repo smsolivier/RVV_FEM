@@ -3,6 +3,14 @@
 
 using namespace std; 
 
+#ifdef __riscv
+#define read_csr(reg) ({ unsigned long __tmp; \
+  asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
+  __tmp; })
+#else 
+#define read_csr(reg) 0; 
+#endif 
+
 #define READ_ALL() \
 	READ_CSR(hpmcounter3); \
 	READ_CSR(hpmcounter4); \
@@ -47,6 +55,7 @@ int HWCounter::Cycles() const {
 }
 
 double HWCounter::GetQ() const {
+	if (_counters[HPMType::fmem]==0) return 0; 
 	return (double)_counters[HPMType::flops]/_counters[HPMType::fmem]; 
 }
 

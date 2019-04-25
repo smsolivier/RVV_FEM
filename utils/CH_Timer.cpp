@@ -8,7 +8,6 @@
 */
 #endif
 
-#include "General.hpp"
 #define CH_DISABLE_SIGNALS
 #undef CH_MPI 
 
@@ -636,6 +635,8 @@ void TraceTimer::start(char* mutex)
   *mutex = 1;
   s_currentTimer[m_thread_id] = this;
   m_last_WCtime_stamp = ch_ticks();
+  m_qp = ch_q(); 
+  m_avlp = ch_avl(); 
 #ifdef  CH_USE_MEMORY_TRACKING
   if(s_traceMemory)
     {
@@ -644,10 +645,12 @@ void TraceTimer::start(char* mutex)
       if(peak > m_peak) m_peak = 0;
     }
 #endif
+    m_hwc.Reset(); 
 }
 unsigned long long int overflowLong = (unsigned long long int)1<<50;
 unsigned long long int TraceTimer::stop(char* mutex)
 {
+  m_hwc.Read(); 	
   if(m_pruned) return 0;
 #ifndef NDEBUG
   if(s_currentTimer[0] != this)
@@ -662,8 +665,8 @@ unsigned long long int TraceTimer::stop(char* mutex)
   diff -= m_last_WCtime_stamp;
   if(diff > overflowLong) diff = 0;
   m_accumulated_WCtime += diff;
-  m_avl += ch_avl(); 
-  m_q += ch_q(); 
+  m_avl += m_hwc.AvgVecLen(); 
+  m_q += m_hwc.GetQ(); 
 #ifdef  CH_USE_MEMORY_TRACKING
   if(s_traceMemory)
     {
@@ -687,8 +690,11 @@ unsigned long long int TraceTimer::stop(char* mutex)
     }
 #endif
   m_last_WCtime_stamp=0;
+  m_qp = 0; 
+  m_avlp = 0; 
   s_currentTimer[m_thread_id] = m_parent;
   *mutex=0;
+  m_hwc.Reset(); 
   return diff;
 }
 
