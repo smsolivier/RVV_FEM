@@ -55,7 +55,7 @@ int HWCounter::Cycles() const {
 }
 
 double HWCounter::GetQ() const {
-	if (_counters[HPMType::fmem]==0) return 0; 
+	if (_counters[HPMType::fmem]==0) WARNING("memory access is zero"); 
 	return (double)_counters[HPMType::flops]/_counters[HPMType::fmem]; 
 }
 

@@ -27,7 +27,7 @@ void Vector::GetFromDofs(const Array<int>& dofs, Vector& v) const {
 void Vector::AddFromDofs(const Array<int>& dofs, Vector& v) {
 	CH_TIMERS("add from dofs"); 
 	CHECKMSG(dofs.GetSize()==v.GetSize() && v.GetSize()>0, "dofs and v sizes must agree"); 
-#ifdef RV_GETDOFS
+#ifdef RV_ADDDOFS
 	AddFromDofs_RV(dofs.GetSize(), dofs.GetData(), v.GetData(), GetData()); 
 #else
 	for (int i=0; i<dofs.GetSize(); i++) {
@@ -206,7 +206,6 @@ void Add(const Vector& a, const Vector& b, Vector& c) {
 #ifdef RV_VECADD
 	VectorAdd2_RV(a.GetSize(), a.GetData(), b.GetData(), c.GetData()); 
 #else
-	#pragma omp parallel for 
 	for (int i=0; i<a.GetSize(); i++) {
 		c[i] = a[i] + b[i]; 
 	}
