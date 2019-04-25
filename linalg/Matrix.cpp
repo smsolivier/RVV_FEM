@@ -1,4 +1,5 @@
 #include "Matrix.hpp"
+#include "Opt.hpp"
 
 using namespace std; 
 
@@ -63,7 +64,7 @@ void Matrix::SetSize(int m, int n) {
 
 void Matrix::operator*=(double val) {
 	CH_TIMERS("matrix scale"); 
-#ifdef USE_RISCV
+#ifdef RV_VECSCALE
 	VectorScale_RV(Height()*Width(), GetData(), &val); 
 #else
 	for (int i=0; i<_m*_n; i++) {
@@ -75,7 +76,7 @@ void Matrix::operator*=(double val) {
 void Matrix::operator+=(const Matrix& a) {
 	CH_TIMERS("matrix +="); 
 	CHECK(a.Height()==Height() && a.Width()==Width()); 
-#ifdef USE_RISCV
+#ifdef RV_VECADD
 	VectorAdd_RV(Height()*Width(), GetData(), a.GetData()); 
 #else
 	for (int i=0; i<_m*_n; i++) {
@@ -87,7 +88,7 @@ void Matrix::operator+=(const Matrix& a) {
 void Matrix::operator-=(const Matrix& a) {
 	CH_TIMERS("matrix -="); 
 	CHECK(a.Height()==Height() && a.Width()==Width()); 
-#ifdef USE_RISCV
+#ifdef RV_VECSUB
 	VectorSub_RV(Height()*Width(), GetData(), a.GetData()); 
 #else
 	for (int i=0; i<_m*_n; i++) {
@@ -147,8 +148,7 @@ double Matrix::Weight() const {
 void Matrix::Mult(const Matrix& a, Matrix& b) const {
 	CHECK(Width()==a.Height()); 
 	b.SetSize(Height(), a.Width()); 
-// #ifdef USE_RISCV
-#if 0 
+#ifdef RV_MATMULT
 	MatMult_RV(Height(), Width(), GetData(), a.GetData(), b.GetData()); 
 #else
 	Mult(1., a, 0., b); 
@@ -201,7 +201,7 @@ void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
 void Matrix::Mult(const Vector& x, Vector& b) const {
 	CHECK(Width()==x.GetSize()); 
 	if (b.GetSize()!=Height()) b.SetSize(Height()); 
-#ifdef USE_RISCV
+#ifdef RV_MATVEC
 	CH_TIMERS("matvec RV"); 
 	MatVec_RV(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
 #else

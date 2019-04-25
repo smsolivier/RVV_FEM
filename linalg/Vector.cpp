@@ -1,4 +1,5 @@
 #include "Vector.hpp"
+#include "Opt.hpp"
 
 namespace fem 
 {
@@ -14,7 +15,7 @@ Vector::Vector(int size, double val) : Array<double>(size, val) {
 void Vector::GetFromDofs(const Array<int>& dofs, Vector& v) const {
 	CH_TIMERS("get from dofs"); 
 	v.Resize(dofs.GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_GETDOFS
 	GetFromDofs_RV(dofs.GetSize(), dofs.GetData(), v.GetData(), GetData()); 
 #else
 	for (int i=0; i<dofs.GetSize(); i++) {
@@ -26,7 +27,7 @@ void Vector::GetFromDofs(const Array<int>& dofs, Vector& v) const {
 void Vector::AddFromDofs(const Array<int>& dofs, Vector& v) {
 	CH_TIMERS("add from dofs"); 
 	CHECKMSG(dofs.GetSize()==v.GetSize() && v.GetSize()>0, "dofs and v sizes must agree"); 
-#ifdef USE_RISCV
+#ifdef RV_GETDOFS
 	AddFromDofs_RV(dofs.GetSize(), dofs.GetData(), v.GetData(), GetData()); 
 #else
 	for (int i=0; i<dofs.GetSize(); i++) {
@@ -38,7 +39,7 @@ void Vector::AddFromDofs(const Array<int>& dofs, Vector& v) {
 void Vector::operator*=(double val) {
 	CH_TIMERS("vector operation *="); 
 	CHECKMSG(GetSize() > 0, "vector not initialized"); 
-#ifdef USE_RISCV
+#ifdef RV_VECSCALE
 	VectorScale_RV(GetSize(), GetData(), &val); 
 #else
 	#pragma omp parallel for 
@@ -51,7 +52,7 @@ void Vector::operator*=(double val) {
 void Vector::operator+=(const Vector& a) {
 	CH_TIMERS("vector +="); 
 	CHECK(a.GetSize() == GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_VECADD
 	VectorAdd_RV(GetSize(), GetData(), a.GetData()); 
 #else
 	#pragma omp parallel for 
@@ -64,7 +65,7 @@ void Vector::operator+=(const Vector& a) {
 void Vector::operator-=(const Vector& a) {
 	CH_TIMERS("vector -="); 
 	CHECK(a.GetSize() == GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_VECSUB
 	VectorSub_RV(GetSize(), GetData(), a.GetData()); 
 #else
 
@@ -78,7 +79,7 @@ void Vector::operator-=(const Vector& a) {
 void Vector::operator/=(const Vector& a) {
 	CH_TIMERS("vector /="); 
 	CHECK(a.GetSize() == GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_VECDIV
 	VectorDiv_RV(GetSize(), GetData(), a.GetData()); 
 #else
 	#pragma omp parallel for 
@@ -91,7 +92,7 @@ void Vector::operator/=(const Vector& a) {
 void Vector::operator*=(const Vector& a) {
 	CH_TIMERS("vector vector *="); 
 	CHECK(a.GetSize() == GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_VECMUL
 	VectorMul_RV(GetSize(), GetData(), a.GetData()); 
 #else
 	#pragma omp parallel for 
@@ -106,7 +107,7 @@ void Vector::OuterProduct(const Vector& a, Matrix& b) const {
 	if (b.Height() != GetSize() || b.Width() != a.GetSize()) {
 		b.SetSize(GetSize(), a.GetSize()); 		
 	}
-#ifdef USE_RISCV
+#ifdef RV_VECOP 
 	VectorOP_RV(GetSize(), a.GetSize(), GetData(), a.GetData(), b.GetData()); 
 #else
 	for (int i=0; i<GetSize(); i++) {
@@ -151,7 +152,7 @@ void Vector::SquareRoot() {
 double Vector::Dot(const Vector& x) const {
 	CH_TIMERS("vector dot product"); 
 	CHECK(x.GetSize() == GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_VECDOT
 	double ret = 0; 
 	VectorDot_RV(GetSize(), GetData(), x.GetData(), &ret); 
 	return ret; 
@@ -202,7 +203,7 @@ void Add(const Vector& a, const Vector& b, Vector& c) {
 	CH_TIMERS("vvadd"); 
 	CHECK(a.GetSize() == b.GetSize()); 
 	if (c.GetSize() != a.GetSize()) c.Resize(a.GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_VECADD
 	VectorAdd2_RV(a.GetSize(), a.GetData(), b.GetData(), c.GetData()); 
 #else
 	#pragma omp parallel for 
@@ -216,7 +217,7 @@ void Subtract(const Vector& a, const Vector& b, Vector& c) {
 	CH_TIMERS("vvsub"); 
 	CHECK(a.GetSize() == b.GetSize()); 
 	if (c.GetSize() != a.GetSize()) c.Resize(a.GetSize()); 
-#ifdef USE_RISCV
+#ifdef RV_VECSUB
 	VectorSub2_RV(a.GetSize(), a.GetData(), b.GetData(), c.GetData()); 
 #else
 	#pragma omp parallel for 
