@@ -67,6 +67,9 @@ all : $(OBJS)
 tests : $(TESTS) 
 run : $(TESTOUT) 
 
+%.S : %.cpp $(HOME)/Makefile
+	$(CXX) -S $(CFLAGS) -fverbose-asm $< -o $@ 
+
 %.out : %
 	$(EXE)$<
 
