@@ -11,6 +11,12 @@
 #include "RHS.hpp"
 #include "SparseMatrix.hpp"
 
+#ifdef USE_RISCV
+// b batches of NxN scattered matvecs 
+extern "C" void RV_MVOuter(int N, int b, const double* mats, const int* dofs, 
+	const double* x, double* b); 
+#endif
+
 namespace fem 
 {
 

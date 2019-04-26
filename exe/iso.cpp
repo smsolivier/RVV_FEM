@@ -40,13 +40,20 @@ void MatVec() {
 }
 
 void BatchMatVec() {
-	Vector b(9); 
+	int n = 4; 
+	Array<Matrix*> mats(N); 
+	for (int i=0; i<N; i++) {
+		mats[i] = new Matrix(n); 
+		for (int j=0; j<n*n; j++) {
+			mats[i]->operator[](j) = i; 
+		}
+	}
+	Vector x(n); 
+	Vector b(n); 
 
 	HWCounter hwc; 
 	for (int i=0; i<N; i++) {
-		Matrix M(9,9); 
-		Vector x(9); 
-		M.Mult(x, b); 
+		mats[i]->Mult(x, b); 
 	}
 	hwc.Read(); 
 	hwc.PrintStats("batch mat vec"); 

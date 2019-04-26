@@ -14,3 +14,6 @@
 #define RV_VECDOT 
 #define RV_GETDOFS 
 #define RV_ADDDOFS
+
+// fematrix optimizations 
+// #define RV_MVOUTER

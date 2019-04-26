@@ -21,18 +21,21 @@ FEMatrix::~FEMatrix() {
 void FEMatrix::Mult(const Vector& x, Vector& b) const {
 	CH_TIMERS("FEMatrix mat vec"); 
 	if (b.GetSize() != Height()) b.SetSize(Height()); 
-
+#ifdef RV_MVOUTER 
+	RV_MVOuter(_data[0].Height(), _space->GetNumElements(), 
+		_data.GetData(), )
+#else
 	Array<int> vdofs; 
 	Vector elvec; 
 	Vector prod; 
 	int Ne = _space->GetNumElements(); 
 	for (int e=0; e<Ne; e++) {
-		const Matrix& elmat = (*this)[e]; 
 		vdofs = _space->GetVDofs(e);  
 		x.GetFromDofs(vdofs, elvec); 
-		elmat.Mult(elvec, prod); 
+		_data[e]->Mult(elvec, prod); 
 		b.AddFromDofs(vdofs, prod); 
 	}
+#endif
 }
 
 void FEMatrix::AddIntegrator(BilinearIntegrator* integ) {
