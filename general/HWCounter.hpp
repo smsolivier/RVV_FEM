@@ -2,24 +2,28 @@
 
 #include <array>
 
-#define NUMCOUNTERS 5
+#define NUMCOUNTERS 8
 
 namespace fem 
 {
 
-enum HPMType {
+/// keeps track of ordering of the _counters array 
+enum HPM {
 	vl_sum,
 	v_instr, 
 	cycles,
 	fmem, 
-	flops
+	flops,
+	accesses, 
+	misses, 
+	bytes_read
 }; 
 
 /// class for reading hardware counters 
 class HWCounter {
 public:
 	/// initialize for a given CSR 
-	HWCounter() { }
+	HWCounter() {Reset(); }
 	/// reset by storing current value 
 	void Reset(); 
 	/// get current values 
@@ -33,6 +37,12 @@ public:
 	double GetQ() const; 
 	/// return flops per cycle 
 	double FlopsPerCycle() const; 
+	/// return cache accesses 
+	uint64_t CacheAccesses() const; 
+	/// return cache misses 
+	uint64_t CacheMisses() const; 
+	/// return bytes read 
+	uint64_t CacheBytesRead() const; 
 
 	void PrintStats(std::string name="main") const; 
 private:

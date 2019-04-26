@@ -31,10 +31,11 @@ else
 	VARS += -march=rv64gc
 	ASM = $(wildcard $(HOME)/linalg/*.S $(HOME)/fem/*.S)
 	ASSEMBLER = $(ASM) -Wa,-march=rv64gcv
-	EXE = spike --isa=rv64gcv pk 
+	EXE = spike --isa=rv64gcv --dc=128:4:64 pk 
 endif 
 
 OPT = -O2 -ffast-math
+# OPT += -funroll-loops
 # OPT = -g 
 
 # # where to look for header files 

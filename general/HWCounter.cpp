@@ -16,7 +16,10 @@ using namespace std;
 	READ_CSR(hpmcounter4); \
 	READ_CSR(cycle);\
 	READ_CSR(hpmcounter5); \
-	READ_CSR(hpmcounter6); 
+	READ_CSR(hpmcounter6); \
+	READ_CSR(hpmcounter7); \
+	READ_CSR(hpmcounter8); \
+	READ_CSR(hpmcounter9); 
 
 namespace fem
 {
@@ -46,21 +49,33 @@ void HWCounter::Read() {
 }
 
 double HWCounter::AvgVecLen() const {
-	if (_counters[HPMType::v_instr] == 0) return 0; 
-	return (double)_counters[HPMType::vl_sum]/_counters[HPMType::v_instr];
+	if (_counters[HPM::v_instr] == 0) return 0; 
+	return (double)_counters[HPM::vl_sum]/_counters[HPM::v_instr];
 }
 
 int HWCounter::Cycles() const {
-	return _counters[HPMType::cycles]; 
+	return _counters[HPM::cycles]; 
 }
 
 double HWCounter::GetQ() const {
-	if (_counters[HPMType::fmem]==0) WARNING("memory access is zero"); 
-	return (double)_counters[HPMType::flops]/_counters[HPMType::fmem]; 
+	if (_counters[HPM::fmem]==0) WARNING("memory access is zero"); 
+	return (double)_counters[HPM::flops]/_counters[HPM::fmem]; 
 }
 
 double HWCounter::FlopsPerCycle() const {
-	return (double)_counters[HPMType::flops]/_counters[HPMType::cycles]; 
+	return (double)_counters[HPM::flops]/_counters[HPM::cycles]; 
+}
+
+uint64_t HWCounter::CacheAccesses() const {
+	return _counters[HPM::accesses]; 
+}
+
+uint64_t HWCounter::CacheMisses() const {
+	return _counters[HPM::misses]; 
+}
+
+uint64_t HWCounter::CacheBytesRead() const {
+	return _counters[HPM::bytes_read]; 
 }
 
 void HWCounter::PrintStats(string name) const {
@@ -68,6 +83,9 @@ void HWCounter::PrintStats(string name) const {
 	cout << "\taverage vl = " << AvgVecLen() << endl; 
 	cout << "\tq = " << GetQ() << endl; 
 	cout << "\tflops / cycle = " << FlopsPerCycle() << endl; 
+	cout << "\tCache: " << CacheMisses() << "/" << CacheAccesses() << ", "
+		<< (double)CacheMisses()/CacheAccesses() << "%, "
+		<< CacheBytesRead() << "B read" << endl; 
 }
 
 } // end namespace fem 
