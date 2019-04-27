@@ -7,7 +7,7 @@
 namespace fem 
 {
 
-/// keeps track of ordering of the _counters array 
+/// keeps track of ordering of the _ctrs array 
 enum HPM {
 	vl_sum,
 	v_instr, 
@@ -43,10 +43,19 @@ public:
 	uint64_t CacheMisses() const; 
 	/// return bytes read 
 	uint64_t CacheBytesRead() const; 
+	/// return the cache miss rate (percentage) 
+	double CacheMissRate() const; 
+
+	/// return an estimate of execution time 
+	/** \param tf number of cycles per flop 
+		\param lm latency of cache miss 
+		\param lh latency of cache hit 
+	*/ 
+	double GetFOM(int tf=3, int lm=20, int lh=1) const; 
 
 	void PrintStats(std::string name="main") const; 
 private:
-	std::array<uint64_t,NUMCOUNTERS> _counters; 
+	std::array<uint64_t,NUMCOUNTERS> _ctrs; 
 }; 
 
 } // end namespace fem 

@@ -39,6 +39,8 @@ void solve(int nref, int order, double& LinfE) {
 	// apply the boundary conditions
 	lhs.ApplyDirichletBoundary(rhs, 0.);
 
+	lhs.ConvertToBatch(); 
+
 	// test symmetry 
 	// TEST(lhs.IsSymmetric(), "diffusion matrix symmetric"); 
 

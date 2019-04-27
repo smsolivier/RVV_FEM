@@ -38,6 +38,8 @@ void solve(int nref, int order) {
 	// apply the boundary conditions
 	lhs.ApplyDirichletBoundary(rhs, 0.);
 
+	lhs.ConvertToBatch();
+
 	HWCounter hwc2; 
 	hwc2.Reset(); 
 	GridFunction x(&h1); 

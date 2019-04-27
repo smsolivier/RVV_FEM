@@ -13,8 +13,13 @@
 
 #ifdef USE_RISCV
 // b batches of NxN scattered matvecs 
-extern "C" void RV_MVOuter(int N, int B, const double* mats, const int* dofs, 
-	const double* x, double* b); 
+extern "C" void MVOuter_RV(int N, int B, const double* mats, 
+	const int* dofs, const double* x, double* b); 
+// b batches of matvecs outputting to contiguous b 
+extern "C" void MVOuterC_RV(int N, int B, const double* mats, 
+	const int* dofs, const double* x, double* b); 
+// scatter add with reduced vl to avoid aliasing 
+extern "C" void BatchAdd_RV(int N, int B, const int* dofs, double* ball, double* b); 
 #endif
 
 namespace fem 
@@ -48,6 +53,8 @@ public:
 	void GetDiagonal(Vector& diag) const; 
 	/// diagonal preconditioning on this matrix 
 	void DiagonalPrecondition(const Vector& diag); 
+	/// convert to batch storage format 
+	void ConvertToBatch(); 
 
 	/// subtract two FEMatrix's 
 	void operator-=(const FEMatrix& A); 
@@ -56,6 +63,10 @@ protected:
 	Array<Matrix*> _data; 
 	/// store the fespace 
 	const FESpace* _space; 
+	/// store data for all matrices contiguously 
+	Array<double> _mats; 
+	/// store the vdofs for each element contiguously 
+	Array<int> _vdofs; 
 }; 
 
 } // end namespace fem 

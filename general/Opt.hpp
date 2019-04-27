@@ -1,5 +1,8 @@
 #pragma once 
 
+#define VECTORIZATION
+
+#ifdef VECTORIZATION 
 // matrix optimizations 
 #define RV_MATVEC 
 // #define RV_MATMULT // not implemented 
@@ -16,4 +19,6 @@
 #define RV_ADDDOFS
 
 // fematrix optimizations 
-// #define RV_MVOUTER
+#define RV_MVOUTER
+
+#endif

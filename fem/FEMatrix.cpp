@@ -1,12 +1,15 @@
 #include "FEMatrix.hpp"
+#include "Opt.hpp"
 
+using namespace std; 
 namespace fem 
 {
 
 FEMatrix::FEMatrix(const FESpace* space) : Operator(space->GetVSize()) {
 	_space = space; 
-	_data.Resize(_space->GetNumElements()); 
-	for (int i=0; i<_data.GetSize(); i++) {
+	int Ne = _space->GetNumElements(); 
+	_data.Resize(Ne); 
+	for (int i=0; i<Ne; i++) {
 		Element& el = _space->GetEl(i); 
 		_data[i] = new Matrix(el.GetNumNodes()); 
 	}
@@ -21,14 +24,18 @@ FEMatrix::~FEMatrix() {
 void FEMatrix::Mult(const Vector& x, Vector& b) const {
 	CH_TIMERS("FEMatrix mat vec"); 
 	if (b.GetSize() != Height()) b.SetSize(Height()); 
+	int Ne = _space->GetNumElements(); 
 #ifdef RV_MVOUTER 
-	RV_MVOuter(_data[0].Height(), _space->GetNumElements(), 
-		_data.GetData(), )
+	if (_mats.GetSize()==0) ERROR("must call ConvertToBatch first"); 
+	int height = _data[0]->Height(); 
+	Vector ball(height*Ne); 
+	MVOuterC_RV(height, Ne, _mats.GetData(), 
+		_vdofs.GetData(), x.GetData(), ball.GetData()); 
+	BatchAdd_RV(height, Ne, _vdofs.GetData(), ball.GetData(), b.GetData()); 
 #else
 	Array<int> vdofs; 
 	Vector elvec; 
 	Vector prod; 
-	int Ne = _space->GetNumElements(); 
 	for (int e=0; e<Ne; e++) {
 		vdofs = _space->GetVDofs(e);  
 		x.GetFromDofs(vdofs, elvec); 
@@ -147,6 +154,26 @@ void FEMatrix::operator-=(const FEMatrix& A) {
 	for (int e=0; e<_space->GetNumElements(); e++) {
 		(*this)[e] -= A[e]; 
 	}
+}
+
+void FEMatrix::ConvertToBatch() {
+#ifdef RV_MVOUTER
+	int Ne = _space->GetNumElements(); 
+	int N = _data[0]->Height(); 
+	_mats.Resize(N*N*Ne); 
+	_vdofs.Resize(N*Ne); 
+	Array<int> vdofs; 
+
+	for (int e=0; e<Ne; e++) {
+		vdofs = _space->GetVDofs(e); 
+		for (int i=0; i<N; i++) {
+			for (int j=0; j<N; j++) {
+				_mats[N*N*e + N*i + j] = _data[e]->operator()(i,j); 
+			}
+			_vdofs[N*e+i] = vdofs[i]; 
+		}
+	}
+#endif
 }
 
 } // end namespace fem 

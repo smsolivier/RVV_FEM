@@ -28,7 +28,7 @@ void HWCounter::Reset() {
 	int i=0; 
 	#define READ_CSR(name) {\
 		uint64_t val = read_csr(name); \
-		_counters[i] = val; \
+		_ctrs[i] = val; \
 		i++; \
 	}
 
@@ -40,7 +40,7 @@ void HWCounter::Read() {
 	int i=0; 
 	#define READ_CSR(name) {\
 		uint64_t val = read_csr(name); \
-		_counters[i] = val - _counters[i]; \
+		_ctrs[i] = val - _ctrs[i]; \
 		i++; \
 	}
 
@@ -49,33 +49,42 @@ void HWCounter::Read() {
 }
 
 double HWCounter::AvgVecLen() const {
-	if (_counters[HPM::v_instr] == 0) return 0; 
-	return (double)_counters[HPM::vl_sum]/_counters[HPM::v_instr];
+	if (_ctrs[HPM::v_instr] == 0) return 0; 
+	return (double)_ctrs[HPM::vl_sum]/_ctrs[HPM::v_instr];
 }
 
 int HWCounter::Cycles() const {
-	return _counters[HPM::cycles]; 
+	return _ctrs[HPM::cycles]; 
 }
 
 double HWCounter::GetQ() const {
-	if (_counters[HPM::fmem]==0) WARNING("memory access is zero"); 
-	return (double)_counters[HPM::flops]/_counters[HPM::fmem]; 
+	if (_ctrs[HPM::fmem]==0) WARNING("memory access is zero"); 
+	return (double)_ctrs[HPM::flops]/_ctrs[HPM::fmem]; 
 }
 
 double HWCounter::FlopsPerCycle() const {
-	return (double)_counters[HPM::flops]/_counters[HPM::cycles]; 
+	return (double)_ctrs[HPM::flops]/_ctrs[HPM::cycles]; 
 }
 
 uint64_t HWCounter::CacheAccesses() const {
-	return _counters[HPM::accesses]; 
+	return _ctrs[HPM::accesses]; 
 }
 
 uint64_t HWCounter::CacheMisses() const {
-	return _counters[HPM::misses]; 
+	return _ctrs[HPM::misses]; 
+}
+
+double HWCounter::CacheMissRate() const {
+	return (double)CacheMisses() / CacheAccesses() * 100.; 
 }
 
 uint64_t HWCounter::CacheBytesRead() const {
-	return _counters[HPM::bytes_read]; 
+	return _ctrs[HPM::bytes_read]; 
+}
+
+double HWCounter::GetFOM(int tf, int lm, int lh) const {
+	double m = CacheMissRate()/100; 
+	return Cycles() + (lm*m + lh*(1-m))*CacheAccesses() + tf*_ctrs[HPM::flops]; 
 }
 
 void HWCounter::PrintStats(string name) const {
@@ -83,9 +92,11 @@ void HWCounter::PrintStats(string name) const {
 	cout << "\taverage vl = " << AvgVecLen() << endl; 
 	cout << "\tq = " << GetQ() << endl; 
 	cout << "\tflops / cycle = " << FlopsPerCycle() << endl; 
+	cout << "\tcycles = " << Cycles() << endl; 
 	cout << "\tCache: " << CacheMisses() << "/" << CacheAccesses() << ", "
 		<< (double)CacheMisses()/CacheAccesses() << "%, "
 		<< CacheBytesRead() << "B read" << endl; 
+	cout << "\tFOM = " << GetFOM() << " cycles" << endl; 
 }
 
 } // end namespace fem 
