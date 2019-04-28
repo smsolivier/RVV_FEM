@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 	hwc2.Read(); 
 	hwc2.PrintStats("inner loop matvec"); 
 
-	cout << "speedup = " << hwc.FlopsPerCycle()/hwc2.FlopsPerCycle() << endl; 
+	cout << "speedup = " << (double)hwc2.Cycles()/hwc.Cycles() << endl; 
 	cout << "miss ratio = " << hwc.CacheMissRate() / hwc2.CacheMissRate() << endl; 
 	cout << "FOM ratio = " << hwc2.GetFOM() / hwc.GetFOM() << endl; 
 

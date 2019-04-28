@@ -84,7 +84,7 @@ uint64_t HWCounter::CacheBytesRead() const {
 
 double HWCounter::GetFOM(int tf, int lm, int lh) const {
 	double m = CacheMissRate()/100; 
-	return Cycles() + (lm*m + lh*(1-m))*CacheAccesses() + tf*_ctrs[HPM::flops]; 
+	return Cycles() + (lm*m + lh*(1-m))*CacheAccesses(); // + tf*_ctrs[HPM::flops]; 
 }
 
 void HWCounter::PrintStats(string name) const {
