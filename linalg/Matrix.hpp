@@ -9,6 +9,8 @@
 extern "C" void MatVec_RV(int N, int M, const double* A, const double* x, double* b); 
 // dgemm: C = A*B 
 extern "C" void MatMult_RV(int N, int M, const double* A, const double* B, double* C); 
+// scalar mat vec 
+extern "C" void MatVec_S(int N, int M, const double* A, const double* x, double* b); 
 #endif
 
 namespace fem 

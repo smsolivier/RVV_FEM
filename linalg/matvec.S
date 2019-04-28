@@ -17,8 +17,7 @@ MatVec_RV:
 	slli t0, a1, 3 # offset for A 
 rows: 
 	setvl(t1, a0)
-	vinsert v3, x0, x0 
-	vadd v0, v3, v3 # zero vector 
+	vslide v0, v0, t1 
 	add t2, a2, x0 
 	add t3, a3, x0 
 	add t4, a1, x0 

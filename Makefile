@@ -20,7 +20,7 @@ VPATH = $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH)
 vpath %.S $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH) 
 
 VARS = -DTESTING
-# VARS = -DUSE_WARNINGS 
+# VARS += -DUSE_WARNINGS 
 VARS += -DNDEBUG
 VARS += -DCH_NTIMER 
 ifeq ($(CXX), g++) 
@@ -35,7 +35,7 @@ else
 	EXE = spike --isa=rv64gcv --dc=128:4:64 pk 
 endif 
 
-OPT = -O2 -ffast-math
+OPT = -O3 -ffast-math
 # OPT += -funroll-loops
 # OPT = -g 
 

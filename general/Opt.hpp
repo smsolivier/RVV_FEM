@@ -1,6 +1,7 @@
 #pragma once 
 
 #define VECTORIZATION
+// #define RV_SMATVEC
 
 #ifdef VECTORIZATION 
 // matrix optimizations 

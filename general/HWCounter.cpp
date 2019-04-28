@@ -91,11 +91,12 @@ void HWCounter::PrintStats(string name) const {
 	cout << name << " stats:" << endl; 
 	cout << "\taverage vl = " << AvgVecLen() << endl; 
 	cout << "\tq = " << GetQ() << endl; 
+	cout << "\tflops = " << _ctrs[HPM::flops] << endl; 
 	cout << "\tflops / cycle = " << FlopsPerCycle() << endl; 
 	cout << "\tcycles = " << Cycles() << endl; 
 	cout << "\tCache: " << CacheMisses() << "/" << CacheAccesses() << ", "
 		<< (double)CacheMisses()/CacheAccesses() << "%, "
-		<< CacheBytesRead() << "B read" << endl; 
+		<< CacheBytesRead()/1024 << "kB read" << endl; 
 	cout << "\tFOM = " << GetFOM() << " cycles" << endl; 
 }
 

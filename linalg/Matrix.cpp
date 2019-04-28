@@ -201,11 +201,12 @@ void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
 void Matrix::Mult(const Vector& x, Vector& b) const {
 	CHECK(Width()==x.GetSize()); 
 	if (b.GetSize()!=Height()) b.SetSize(Height()); 
-#ifdef RV_MATVEC
-	CH_TIMERS("matvec RV"); 
-	MatVec_RV(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
-#else
 	CH_TIMERS("matvec"); 
+#ifdef RV_MATVEC
+	MatVec_RV(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
+#elif defined RV_SMATVEC
+	MatVec_S(Height(), Width(), GetData(), x.GetData(), b.GetData()); 
+#else 
 	Mult(1., x, 0., b); 
 #endif
 }
