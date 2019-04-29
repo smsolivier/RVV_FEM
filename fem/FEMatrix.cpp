@@ -25,13 +25,18 @@ void FEMatrix::Mult(const Vector& x, Vector& b) const {
 	CH_TIMERS("FEMatrix mat vec"); 
 	if (b.GetSize() != Height()) b.SetSize(Height()); 
 	int Ne = _space->GetNumElements(); 
-#ifdef RV_MVOUTER 
+#ifdef RV_MVOUTERC
 	if (_mats.GetSize()==0) ERROR("must call ConvertToBatch first"); 
 	int height = _data[0]->Height(); 
 	Vector ball(height*Ne); 
 	MVOuterC_RV(height, Ne, _mats.GetData(), 
 		_vdofs.GetData(), x.GetData(), ball.GetData()); 
 	BatchAdd_RV(height, Ne, _vdofs.GetData(), ball.GetData(), b.GetData()); 
+#elif defined RV_MVOUTER 
+	if (_mats.GetSize()==0) ERROR("must call ConvertToBatch first"); 
+	int height = _data[0]->Height(); 
+	MVOuter_RV(height, Ne, _mats.GetData(), 
+		_vdofs.GetData(), x.GetData(), b.GetData()); 	
 #else
 	Array<int> vdofs; 
 	Vector elvec; 
@@ -157,7 +162,7 @@ void FEMatrix::operator-=(const FEMatrix& A) {
 }
 
 void FEMatrix::ConvertToBatch() {
-#ifdef RV_MVOUTER
+#if defined RV_MVOUTER || defined RV_MVOUTERC 
 	int Ne = _space->GetNumElements(); 
 	int N = _data[0]->Height(); 
 	_mats.Resize(N*N*Ne); 

@@ -19,7 +19,6 @@ double Source(const Point& x) {
 
 double ComputeError(int N, int p) {
 	HWCounter hwc; 
-	hwc.Reset(); 
 	CubeMesh mesh({N, N, N}); 
 	LagrangeSpace h1(mesh, p); 
 
@@ -34,13 +33,16 @@ double ComputeError(int N, int p) {
 
 	K.ApplyDirichletBoundary(rhs); 
 
+	K.ConvertToBatch(); 
+	hwc.Reset(); 
 	CG cg(&K, 1e-5, 1000); 
 	cg.Solve(rhs, x); 
+	hwc.Read(); 
 
 	FunctionCoefficient ex(Exact); 
 	double err = x.L2Error(&ex); 
-	hwc.Read(); 
-	cout << "avg vl = " << hwc.AvgVecLen() << endl; 
+
+	hwc.PrintStats("N = " + to_string(N)); 
 	
 	return err; 
 }

@@ -21,5 +21,6 @@
 
 // fematrix optimizations 
 #define RV_MVOUTER
+// #define RV_MVOUTERC 
 
 #endif
