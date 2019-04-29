@@ -74,20 +74,23 @@ LagrangeSpace::LagrangeSpace(const Mesh& mesh, int order, int vdim)
 	}
 
 	// assign global id 
-	Array<Node> nodes; 
-	int count = 0; 
-	for (int i=0; i<_el.GetSize(); i++) {
-		for (int j=0; j<_el[i]->GetNumNodes(); j++) {
-			int match = FindMatch(_el[i]->GetNode(j), nodes); 
-			if (match > 0) {
-				_el[i]->GetNode(j).SetGlobalID(nodes[match].GetGlobalID()); 
-			} else {
-				_el[i]->GetNode(j).SetGlobalID(count++); 
-				nodes.Append(_el[i]->GetNode(j)); 
+	{
+		CH_TIMERS("relabel nodes"); 
+		Array<Node> nodes; 
+		int count = 0; 
+		for (int i=0; i<_el.GetSize(); i++) {
+			for (int j=0; j<_el[i]->GetNumNodes(); j++) {
+				int match = FindMatch(_el[i]->GetNode(j), nodes); 
+				if (match > 0) {
+					_el[i]->GetNode(j).SetGlobalID(nodes[match].GetGlobalID()); 
+				} else {
+					_el[i]->GetNode(j).SetGlobalID(count++); 
+					nodes.Append(_el[i]->GetNode(j)); 
+				}
 			}
 		}
+		_nodes = nodes; 
 	}
-	_nodes = nodes; 
 
 	for (int i=0; i<_nodes.GetSize(); i++) {
 		if (_nodes[i].GetBC() != INTERIOR) {
