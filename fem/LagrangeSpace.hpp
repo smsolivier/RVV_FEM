@@ -5,6 +5,11 @@
 #include "Element.hpp"
 #include "Polynomial.hpp"
 
+#ifdef USE_RISCV 
+extern "C" void CalcShape_RV(int Nn, int Nc, 
+	const double* coef_x, const double* coef_y, double* shape, double* x); 
+#endif
+
 namespace fem 
 {
 
@@ -56,6 +61,14 @@ private:
 	Array<PolyProduct> _pp; 
 	/// gradients 
 	Array<Array<PolyProduct>> _dpp; 
+	/// batched version of 1d x shape functions 
+	Array<double> _shapex; 
+	/// batched version of 1d y shape functions 
+	Array<double> _shapey; 
+	/// batched derivative of x shape functions 
+	Array<double> _dshapex; 
+	/// batched derivative of y shape functions 
+	Array<double> _dshapey; 
 }; 
 
 /// represent a lagrange triangle finite element 

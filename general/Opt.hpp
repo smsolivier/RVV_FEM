@@ -23,4 +23,8 @@
 #define RV_MVOUTER
 // #define RV_MVOUTERC 
 
+// fespace optimizations 
+#define RV_SHAPE
+#define RV_GSHAPE 
+
 #endif

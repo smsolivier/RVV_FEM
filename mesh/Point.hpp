@@ -53,6 +53,9 @@ public:
 		}
 		return sqrt(dist); 
 	}
+
+	/// return pointer to data 
+	double* GetData() {return _x.data(); }
 private:
 	/// store location array 
 	std::array<double,DIM> _x; 

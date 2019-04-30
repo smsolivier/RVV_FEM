@@ -21,8 +21,8 @@ vpath %.S $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH)
 
 VARS = -DTESTING
 # VARS += -DUSE_WARNINGS 
-VARS += -DNDEBUG
-VARS += -DCH_NTIMER 
+# VARS += -DNDEBUG
+# VARS += -DCH_NTIMER 
 ifeq ($(CXX), g++) 
 	EXE = ./
 	VARS += -DUSE_UNWIND
@@ -37,10 +37,10 @@ endif
 
 OPT = -O3 -ffast-math
 # OPT += -funroll-loops
-# OPT = -g 
+# OPT += -g 
 
 # # where to look for header files 
-CFLAGS = -std=c++17 -g -I$(UTILS) -I$(FEM) -I$(LINALG) \
+CFLAGS = -std=c++17 -I$(UTILS) -I$(FEM) -I$(LINALG) \
 	-I$(GENERAL) -I$(MESH) -I$(HOME) 
 CFLAGS += $(OPT) $(VARS)
 

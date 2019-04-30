@@ -2,11 +2,7 @@
 #ifdef USE_MPI 
 #include <mpi.h>
 #endif
-
-#ifdef USE_RISCV
-extern "C" void CalcShape_RV(int N, int Nc, double* shape, double* x, 
-	const double* coef1, const double* coef2); 
-#endif
+#include "Opt.hpp"
 
 using namespace std; 
 
@@ -143,6 +139,7 @@ void LagrangeLine::CalcGradShape(Point x, Matrix& gradshape) const {
 
 LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim) 
 	: Element(node_list, order, QUAD, mdim) {
+	CH_TIMERS("build lagrange quad element"); 
 
 	for (int i=0; i<_geo_nodes.GetSize(); i++) {
 		_nodes.Append(Node(_geo_nodes[i].x, _nodes.GetSize(), 
@@ -278,28 +275,69 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 	for (int i=0; i<_pp.GetSize(); i++) {
 		_pp[i].Gradient(_dpp[i]); 
 	}
+
+	_shapex.Resize(_pp.GetSize()*(_order+1)); 
+	_shapey.Resize(_pp.GetSize()*(_order+1)); 
+
+	for (int i=0; i<_pp.GetSize(); i++) {
+		for (int j=0; j<_order+1; j++) {
+			_shapex[i*(_order+1)+j] = _pp[i].Get1D(0).GetCoefs()[j];
+			_shapey[i*(_order+1)+j] = _pp[i].Get1D(1).GetCoefs()[j];  
+		}
+	}
+
+	_dshapex.Resize(_mdim*GetNumNodes()*(_order+1));
+	_dshapey.Resize(_mdim*GetNumNodes()*(_order+1));  
+	for (int i=0; i<GetNumNodes(); i++) {
+		for (int j=0; j<_order; j++) {
+			_dshapex[i*(_order+1)+j] = _dpp[i][0].Get1D(0).GetCoefs()[j]; 
+		} 
+		for (int j=0; j<_order+1; j++) {
+			_dshapey[i*(_order+1)+j] = _dpp[i][0].Get1D(1).GetCoefs()[j]; 
+		}
+	}
+	for (int i=0; i<GetNumNodes(); i++) {
+		for (int j=0; j<_order+1; j++) {
+			_dshapex[i*(_order+1)+j+GetNumNodes()*(_order+1)] = 
+				_dpp[i][1].Get1D(0).GetCoefs()[j]; 
+		} 
+		for (int j=0; j<_order; j++) {
+			_dshapey[i*(_order+1)+j+GetNumNodes()*(_order+1)] = 
+				_dpp[i][1].Get1D(1).GetCoefs()[j]; 
+		}
+	}
 }
 
 void LagrangeQuad::CalcShape(Point x, 
 	Vector& shape) const {
 	CH_TIMERS("lagrange quad calc shape"); 
-
 	shape.SetSize(GetNumNodes()); 
+#ifdef RV_SHAPE 
+	shape = 1.; 
+	CalcShape_RV(GetNumNodes(), _order+1, _shapex.GetData(), 
+		_shapey.GetData(), shape.GetData(), x.GetData()); 
+#else
 	for (int i=0; i<_pp.GetSize(); i++) {
 		shape[i] = _pp[i](x); 
 	}
+#endif
 }
 
 void LagrangeQuad::CalcGradShape(Point x, 
 	Matrix& gradshape) const {
 	CH_TIMERS("lagrange quad calc grad shape"); 
-
 	gradshape.SetSize(_mdim, GetNumNodes()); 
+#ifdef RV_GSHAPE 
+	gradshape = 1.; 
+	CalcShape_RV(GetNumNodes()*2, _order+1, _dshapex.GetData(), 
+		_dshapey.GetData(), gradshape.GetData(), x.GetData()); 
+#else
 	for (int i=0; i<_dpp.GetSize(); i++) {
 		for (int j=0; j<_mdim; j++) {
 			gradshape(j, i) = _dpp[i][j](x); 
 		}
 	}
+#endif
 }
 
 void LagrangeQuad::CalcPhysGradShape(ElTrans& trans, 
