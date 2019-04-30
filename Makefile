@@ -21,8 +21,8 @@ vpath %.S $(UTILS) $(FEM) $(LINALG) $(GENERAL) $(MESH)
 
 VARS = -DTESTING
 # VARS += -DUSE_WARNINGS 
-# VARS += -DNDEBUG
-# VARS += -DCH_NTIMER 
+VARS += -DNDEBUG
+VARS += -DCH_NTIMER 
 ifeq ($(CXX), g++) 
 	EXE = ./
 	VARS += -DUSE_UNWIND

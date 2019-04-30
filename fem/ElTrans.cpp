@@ -74,15 +74,7 @@ const Matrix& ElTrans::Jacobian() {
 	if (!_bjac) {
 		CH_TIMERS("jacobian"); 
 		_el->CalcGradShape(_x, _gshape); 
-		// _gshape.Mult(_el->GetNodeLocationMatrix(), _J); 
-		for (int i=0; i<_dim; i++) {
-			for (int j=0; j<_mdim; j++) {
-				_J(i,j) = 0.; 
-				for (int k=0; k<_el->GetNumNodes(); k++) {
-					_J(i,j) += _gshape(i,k)*(*_el)[k].GetX()[j]; 
-				}
-			}
-		}
+		_gshape.Mult(_el->GetNodeLocationMatrix(), _J); 
 		_bjac = true; 
 	}
 	return _J; 
