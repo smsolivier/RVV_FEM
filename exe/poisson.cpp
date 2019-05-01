@@ -33,7 +33,7 @@ void solve(int nref, int order) {
 	// vector builder 
 	RHS rhs(&h1); 
 	FunctionCoefficient Source(source); 
-	rhs.AddIntegrator(new DomainIntegrator(&Source)); 
+	rhs.AddIntegrator(new DomainIntegrator(&Source, 0, 1)); 
 
 	// apply the boundary conditions
 	lhs.ApplyDirichletBoundary(rhs, 0.);

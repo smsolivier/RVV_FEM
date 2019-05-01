@@ -25,7 +25,11 @@ protected:
 class DomainIntegrator : public LinearIntegrator {
 public:
 	/// constructor 
-	DomainIntegrator(Coefficient* c=NULL) {_c = c; }
+	DomainIntegrator(Coefficient* c=NULL, int oa=2, int ob=1) {
+		_c = c; 
+		_oa = oa; 
+		_ob = ob; 
+	}
 	/// assemble local vector 
 	void Assemble(Element& el, Vector& elvec); 
 private:
@@ -33,6 +37,9 @@ private:
 	Vector _shape; 
 	/// store function for Q 
 	Coefficient* _c; 
+	/// quadrature order function coefficient 
+	int _oa; 
+	int _ob; 
 }; 
 
 /// integrate boundary contribution for UpwindFaceIntegrator 

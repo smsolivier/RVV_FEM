@@ -47,7 +47,9 @@ public:
 	/// get number of nodes 
 	int GetNumNodes() const {return _nodes.GetSize(); }
 	/// set neighbors based on node information 
-	void SetNeighbors(Array<MeshNode>& nodes); 
+	void SetNeighbors(Array<MeshNode>& nodes);
+	/// set neighbors 
+	void SetNeighbors(Array<int>& nei) {_neighbors = nei; } 
 	/// return the neighbors array 
 	const Array<int>& GetNeighbors() const {return _neighbors; }
 

@@ -178,7 +178,7 @@ void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {
 	for (int i=0; i<Height(); i++) {
 		for (int j=0; j<B.Width(); j++) {
 			for (int k=0; k<Width(); k++) {
-				C(i,j) = beta*C(i,j) + alpha*(*this)(i,k)*B(k,j); 
+				C(i,j) += beta*C(i,j) + alpha*(*this)(i,k)*B(k,j); 
 			}
 		}
 	}

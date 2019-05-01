@@ -18,6 +18,22 @@ int FindMatch(const Node& node, const Array<Node>& list) {
 	return -1; 
 }
 
+int FindMatch(const Node& node, const Array<int>& neighb, 
+	Array<Element*> els) {
+	for (int e=0; e<neighb.GetSize(); e++) {
+		if (neighb[e] >= 0) {
+			Element* el = els[neighb[e]]; 
+			for (int n=0; n<el->GetNumNodes(); n++) {
+				if (el->GetNode(n).CheckEqual(node)) {
+					if (el->GetNodeGlobalID(n)>=0)
+						return el->GetNodeGlobalID(n); 
+				}
+			}			
+		}
+	}
+	return -2; 
+}
+
 bool InVector(const Array<int>& unique, int tag) {
 	for (int i=0; i<unique.GetSize(); i++) {
 		if (unique[i] == tag) return true; 
@@ -77,8 +93,10 @@ LagrangeSpace::LagrangeSpace(const Mesh& mesh, int order, int vdim)
 		for (int i=0; i<_el.GetSize(); i++) {
 			for (int j=0; j<_el[i]->GetNumNodes(); j++) {
 				int match = FindMatch(_el[i]->GetNode(j), nodes); 
-				if (match > 0) {
-					_el[i]->GetNode(j).SetGlobalID(nodes[match].GetGlobalID()); 
+				// int match = FindMatch(_el[i]->GetNode(j), 
+					// mesh.GetElement(i).GetNeighbors(), _el); 
+				if (match >= 0) {
+					_el[i]->GetNode(j).SetGlobalID(match); 
 				} else {
 					_el[i]->GetNode(j).SetGlobalID(count++); 
 					nodes.Append(_el[i]->GetNode(j)); 
@@ -142,8 +160,10 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 	CH_TIMERS("build lagrange quad element"); 
 
 	for (int i=0; i<_geo_nodes.GetSize(); i++) {
+		// _nodes.Append(Node(_geo_nodes[i].x, _nodes.GetSize(), 
+			// _geo_nodes[i].id, _geo_nodes[i].bc)); 
 		_nodes.Append(Node(_geo_nodes[i].x, _nodes.GetSize(), 
-			_geo_nodes[i].id, _geo_nodes[i].bc)); 
+			-1, _geo_nodes[i].bc)); 
 		_nodes[i].SetProcs(node_list[i].procs); 
 	}
 

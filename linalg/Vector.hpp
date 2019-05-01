@@ -50,10 +50,7 @@ public:
 	/// add to this from corresponding vdofs 
 	void AddFromDofs(const Array<int>& vdofs, Vector& v); 
 	/// resize the array 
-	void SetSize(int size, double val=0) {
-		CH_TIMERS("resize vector"); 
-		Resize(size); 
-	} 
+	void SetSize(int size, double val=0) {Resize(size); } 
 	/// scale this by val 
 	void operator*=(double val); 
 	/// add a Vector to *this 

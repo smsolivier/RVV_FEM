@@ -46,6 +46,19 @@ SquareMesh::SquareMesh(int Nx, int Ny, Point low, Point high, Array<int> bcs) {
 			el.AddNode(FLAT(i+1,j)); 
 
 			el.SetID(_el.GetSize()); 
+
+			Array<int> neighb(4); 
+			neighb[0] = (i-1)*Nx + j; 
+			neighb[1] = i*Nx + j + 1; 
+			neighb[2] = (i+1)*Nx + j; 
+			neighb[3] = i*Nx + j - 1; 	
+			for (int k=0; k<4; k++) {
+				if (neighb[k] < 0 or neighb[k] >= nEl) {
+					neighb[k] = -1; 
+				}
+			}
+
+			el.SetNeighbors(neighb); 
 			_el.Append(el); 
 		}
 	}
@@ -66,7 +79,7 @@ SquareMesh::SquareMesh(int Nx, int Ny, Point low, Point high, Array<int> bcs) {
 		}
 	}
 
-	FindNeighbors(); 
+	// FindNeighbors(); 
 }
 
 CubeMesh::CubeMesh(Array<int> N, Point low, Point high, Array<int> bc) {
@@ -129,11 +142,29 @@ CubeMesh::CubeMesh(Array<int> N, Point low, Point high, Array<int> bc) {
 				el.AddNode(flat(i+1,j+1,k)); 
 
 				el.SetID(_el.GetSize()); 
+
+				Array<int> neighb(6); 
+				neighb[0] = k + j*N[0] + (i-1)*N[0]*N[1]; 
+				neighb[1] = k + j*N[0] + (i+1)*N[0]*N[1]; 
+				neighb[2] = k + (j-1)*N[0] + i*N[0]*N[1]; 
+				neighb[3] = k + (j+1)*N[0] + i*N[0]*N[1]; 
+				neighb[4] = k - 1 + j*N[0] + i*N[0]*N[1]; 
+				neighb[5] = k + 1 + j*N[0] + i*N[0]*N[1]; 
+				if (k==N[0]-1) neighb[5] = -1; 
+				if (k==0) neighb[4] = -1; 
+				if (j==N[1]-1) neighb[3] = -1; 
+				if (j==0) neighb[2] = -1; 
+				if (i==N[2]-1) neighb[1] = -1; 
+				if (i==0) neighb[0] = -1; 
+				
+				neighb.Print(); 
+				el.SetNeighbors(neighb); 
+
 				_el.Append(el); 
 			}
 		}
 	}
-	FindNeighbors(); 
+	// FindNeighbors(); 
 }
 
 } // end namespace fem 

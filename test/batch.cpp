@@ -8,7 +8,9 @@ using namespace fem;
 
 bool MVO1(double* mats, int* dofs, Vector& x, Vector& b, Vector& ans) {
 	HWCounter hwc; 
+#ifdef RV_MVOUTER 
 	MVOuter_RV(N, BATCHES, mats, dofs, x.GetData(), b.GetData()); 
+#endif
 	hwc.Read(); 
 	hwc.PrintStats("mvo1"); 
 
@@ -18,7 +20,9 @@ bool MVO1(double* mats, int* dofs, Vector& x, Vector& b, Vector& ans) {
 
 bool MVO2(double* mats, int* dofs, Vector& x, Vector& b, Vector& ans) {
 	HWCounter hwc; 
+#ifdef RV_MVOUTERC 
 	MVOuterC_RV(N, BATCHES, mats, dofs, x.GetData(), b.GetData()); 
+#endif
 	hwc.Read(); 
 	hwc.PrintStats("mvo2"); 
 
@@ -27,6 +31,7 @@ bool MVO2(double* mats, int* dofs, Vector& x, Vector& b, Vector& ans) {
 }
 
 int main() {
+#if defined RV_MVOUTER && RV_MVOUTERC 
 	double* mats = new double[N*N*BATCHES]; 
 	int* dofs = new int[N*BATCHES]; 
 	Array<Matrix*> mat_array(BATCHES); 
@@ -68,4 +73,5 @@ int main() {
 	TEST(MVO1(mats, dofs, x, b, ans), "outer loop type 1"); 
 	b = 0.; 
 	TEST(MVO2(mats, dofs, x, b, ans), "outer loop type 2"); 
+#endif
 }

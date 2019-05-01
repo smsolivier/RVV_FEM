@@ -53,7 +53,7 @@ double HWCounter::AvgVecLen() const {
 	return (double)_ctrs[HPM::vl_sum]/_ctrs[HPM::v_instr];
 }
 
-int HWCounter::Cycles() const {
+uint64_t HWCounter::Cycles() const {
 	return _ctrs[HPM::cycles]; 
 }
 

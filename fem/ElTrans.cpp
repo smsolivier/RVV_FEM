@@ -53,6 +53,7 @@ void ElTrans::Transform(const Point& x_ref, Point& x_phys) {
 	CH_TIMERS("transform x"); 
 	ASSERT(_el_set); 
 	if (_points.Height()==0) {
+		CH_TIMERS("build points matrix"); 
 		_points.SetSize(_mdim, _el->GetNumNodes()); 
 		for (int i=0; i<_mdim; i++) {
 			for (int j=0; j<_el->GetNumNodes(); j++) {

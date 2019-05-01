@@ -50,6 +50,30 @@ int main() {
 	m.Mult(x, mx); 
 	TEST(mx[0]==4 && mx[1]==6 && mx[2]==4, "matvec (3x3)"); 
 
+	// blas DGEMM 
+	Matrix A(3,3); 
+	Matrix B(3,3); 
+	Matrix C(3,3); 
+	Matrix C2(3,3); 
+
+	for (int i=0; i<A.Height(); i++) {
+		for (int j=0; j<A.Width(); j++) {
+			A(i,j) = (double)rand()/RAND_MAX; 
+			B(i,j) = (double)rand()/RAND_MAX; 
+		}
+	}
+
+	A.Mult(2., B, 0., C); 
+
+	for (int i=0; i<A.Height(); i++) {
+		for (int j=0; j<B.Width(); j++) {
+			for (int k=0; k<A.Width(); k++) {
+				C2(i,j) += 2.*A(i,k)*B(k,j); 
+			}
+		}
+	}
+	TEST(C2 == C, "blas dgemm"); 
+
 	Matrix M(10, 10); 
 	Vector XX(10); 
 	for (int i=0; i<M.Height(); i++) {
@@ -118,30 +142,6 @@ int main() {
 	diag(1,1) = 1; 
 	diag(2,2) = 1; 
 	TEST(diag.IsDiagonal() && !tmult.IsDiagonal(), "diagonal check is correct"); 
-
-	// blas DGEMM 
-	Matrix A(3,3); 
-	Matrix B(3,3); 
-	Matrix C(3,3); 
-	Matrix C2(3,3); 
-
-	for (int i=0; i<A.Height(); i++) {
-		for (int j=0; j<A.Width(); j++) {
-			A(i,j) = (double)rand()/RAND_MAX; 
-			B(i,j) = (double)rand()/RAND_MAX; 
-		}
-	}
-
-	A.Mult(2., B, 0., C); 
-
-	for (int i=0; i<A.Height(); i++) {
-		for (int j=0; j<B.Width(); j++) {
-			for (int k=0; k<A.Width(); k++) {
-				C2(i,j) += 2.*A(i,k)*B(k,j); 
-			}
-		}
-	}
-	TEST(C2 == C, "blas dgemm"); 
 
 	hwc.Read(); 
 

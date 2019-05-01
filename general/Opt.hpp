@@ -3,7 +3,7 @@
 #define VECTORIZATION
 // #define RV_SMATVEC
 
-#ifdef VECTORIZATION 
+#if defined VECTORIZATION && defined USE_RISCV 
 // matrix optimizations 
 #define RV_MATVEC 
 #define RV_MATMULT 

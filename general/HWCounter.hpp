@@ -32,7 +32,7 @@ public:
 	/// return average vector length 
 	double AvgVecLen() const; 
 	/// return elapsed cycles 
-	int Cycles() const; 
+	uint64_t Cycles() const; 
 	/// return arithmetic intensity 
 	double GetQ() const; 
 	/// return flops per cycle 

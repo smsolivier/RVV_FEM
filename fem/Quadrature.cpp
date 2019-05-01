@@ -13,6 +13,11 @@ QuadRules QRules;
 QuadLegendre::QuadLegendre(int p) : Quadrature(p) {
 	Array<double> x; 
 	switch(_p) {
+		case 1: {
+			x = {.5}; 
+			_w = {1}; 
+			break; 
+		}
 		case 2: {
 			x = {0.21132487, 0.78867513}; 
 			_w = {.5, .5}; 

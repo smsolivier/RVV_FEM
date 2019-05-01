@@ -17,12 +17,10 @@ FESpace::~FESpace() {
 }
 
 void FESpace::GetVDofs(int e, Array<int>& vdofs) const {
-	CH_TIMERS("get vdofs"); 
 	vdofs = _vdofs[e]; 
 }
 
 const Array<int>& FESpace::GetVDofs(int e) const {
-	CH_TIMERS("get vdofs reference"); 
 	return _vdofs[e]; 
 }
 
