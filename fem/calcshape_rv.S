@@ -27,8 +27,7 @@ CalcShape_RV:
 		SCALAR | FP | W64,
 		SCALAR | FP | W64
 	)
-	li t1, 1024                                                                                                       
-	setvl(t0, t1)
+	setvl(t0, a0)
 	vld v8, 0(a4) # load ones 
 	# load x and y in scalar vector registers 
 	vld v6, 0(a5) # x 

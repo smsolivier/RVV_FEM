@@ -156,8 +156,6 @@ CubeMesh::CubeMesh(Array<int> N, Point low, Point high, Array<int> bc) {
 				if (j==0) neighb[2] = -1; 
 				if (i==N[2]-1) neighb[1] = -1; 
 				if (i==0) neighb[0] = -1; 
-				
-				neighb.Print(); 
 				el.SetNeighbors(neighb); 
 
 				_el.Append(el); 

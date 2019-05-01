@@ -23,22 +23,25 @@ void solve(int nref, int order) {
 	SquareMesh mesh(nref, nref, {0,0}, {1,1}); 
 
 	// fem space 
+	HWCounter lspace; 
 	LagrangeSpace h1(mesh, order); 
+	lspace.Read(); 
 
 	// matrix builder 
+	HWCounter hwc3; 
 	FEMatrix lhs(&h1); 
 	lhs.AddIntegrator(new WeakDiffusionIntegrator); 
 	lhs.AddIntegrator(new MassIntegrator); 
 
 	// vector builder 
 	RHS rhs(&h1); 
-	FunctionCoefficient Source(source); 
+	ConstantCoefficient Source(1); 
 	rhs.AddIntegrator(new DomainIntegrator(&Source, 0, 1)); 
 
 	// apply the boundary conditions
 	lhs.ApplyDirichletBoundary(rhs, 0.);
-
 	lhs.ConvertToBatch();
+	hwc3.Read(); 
 
 	HWCounter hwc2; 
 	hwc2.Reset(); 
@@ -48,6 +51,8 @@ void solve(int nref, int order) {
 	hwc.Read(); 
 	hwc2.Read(); 
 
+	lspace.PrintStats("fe space"); 
+	hwc3.PrintStats("assembly"); 
 	hwc2.PrintStats("cg solve"); 
 	hwc.PrintStats(); 
 }
