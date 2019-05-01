@@ -12,6 +12,25 @@ Vector::Vector(int size, double val) : Array<double>(size, val) {
 
 }
 
+void Vector::operator=(double val) {
+	CH_TIMERS("vector = double"); 
+#ifdef RV_SETEQ
+	SetEqual_RV(GetSize(), &val, GetData()); 
+#else
+	for (int i=0; i<GetSize(); i++) {
+		(*this)[i] = val; 
+	}
+#endif
+}
+
+void Vector::operator=(const Vector& v) {
+	CH_TIMERS("vector = vector"); 
+	SetSize(v.GetSize()); 
+	for (int i=0; i<GetSize(); i++) {
+		(*this)[i] = v[i]; 
+	}
+}
+
 void Vector::GetFromDofs(const Array<int>& dofs, Vector& v) const {
 	CH_TIMERS("get from dofs"); 
 	v.Resize(dofs.GetSize()); 
@@ -167,6 +186,12 @@ double Vector::Dot(const Vector& x) const {
 }
 
 double Vector::L2Norm() const {
+	CH_TIMERS("vector L2 norm"); 
+#ifdef RV_VECDOT 
+	double ret = 0; 
+	VectorDot_RV(GetSize(), GetData(), GetData(), &ret); 
+	return sqrt(ret); 
+#else
 	double sum = 0; 
 
 	// #pragma omp parallel for reduction(+:sum) 
@@ -174,6 +199,7 @@ double Vector::L2Norm() const {
 		sum += (*this)[i]*(*this)[i]; 
 	}
 	return sqrt(sum); 
+#endif
 }
 
 double Vector::LinfNorm() const {

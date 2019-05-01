@@ -42,6 +42,17 @@ Matrix& Matrix::operator=(const Matrix& m) {
 	return *this; 
 }
 
+void Matrix::operator=(double val) {
+	CH_TIMERS("matrix = double"); 
+#ifdef RV_SETEQ 
+	SetEqual_RV(Height()*Width(), &val, GetData()); 
+#else
+	for (int i=0; i<Height()*Width(); i++) {
+		(*this)[i] = val; 
+	}
+#endif
+}
+
 double& Matrix::operator()(int i, int j) {
 	CHECKMSG(i < _m && j < _n, 
 		"index = (" << i << ", " << j << "), size = " << _m << " x " << _n); 

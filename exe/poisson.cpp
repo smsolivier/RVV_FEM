@@ -26,6 +26,7 @@ void solve(int nref, int order) {
 	HWCounter lspace; 
 	LagrangeSpace h1(mesh, order); 
 	lspace.Read(); 
+	lspace.PrintStats("fe space"); 
 
 	// matrix builder 
 	HWCounter hwc3; 
@@ -42,17 +43,16 @@ void solve(int nref, int order) {
 	lhs.ApplyDirichletBoundary(rhs, 0.);
 	lhs.ConvertToBatch();
 	hwc3.Read(); 
+	hwc3.PrintStats("assembly"); 
 
 	HWCounter hwc2; 
-	hwc2.Reset(); 
 	GridFunction x(&h1); 
 	CG cg(&lhs, 1e-10, 1000); 
+	hwc2.Reset(); 
 	cg.Solve(rhs, x); 
 	hwc.Read(); 
 	hwc2.Read(); 
 
-	lspace.PrintStats("fe space"); 
-	hwc3.PrintStats("assembly"); 
 	hwc2.PrintStats("cg solve"); 
 	hwc.PrintStats(); 
 }

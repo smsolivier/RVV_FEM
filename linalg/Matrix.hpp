@@ -46,7 +46,7 @@ public:
 	/// return the number of columns 
 	int Width() const {return _n; }
 	/// set all values to val 
-	// void operator=(double val); 
+	void operator=(double val); 
 	/// scale all entries by val 
 	void operator*=(double val); 
 	/// add a submatrix to this 

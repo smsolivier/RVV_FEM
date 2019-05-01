@@ -27,7 +27,9 @@ extern "C" void VectorSub2_RV(int N, const double* a, const double* b, double* c
 // gather, add, and scatter 
 extern "C" void AddFromDofs_RV(int N, const int* dofs, const double* v, double* out);
 // gather 
-extern "C" void GetFromDofs_RV(int N, const int* dofs, double* v, const double* out); 
+extern "C" void GetFromDofs_RV(int N, const int* dofs, double* v, const double* out);
+// set equal to a double 
+extern "C" void SetEqual_RV(int N, double* val, double* v);  
 #endif
 
 namespace fem 
@@ -51,6 +53,10 @@ public:
 	void AddFromDofs(const Array<int>& vdofs, Vector& v); 
 	/// resize the array 
 	void SetSize(int size, double val=0) {Resize(size); } 
+	/// set all elements to a value 
+	void operator=(double val); 
+	/// set equal to another vector 
+	void operator=(const Vector& v); 
 	/// scale this by val 
 	void operator*=(double val); 
 	/// add a Vector to *this 

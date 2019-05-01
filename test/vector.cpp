@@ -43,12 +43,24 @@ bool GetDofs() {
 	return EQUAL(v[0], 5) && EQUAL(v[1], 2) && EQUAL(v[2], 8); 
 }
 
+bool SetEqual() {
+	Vector x(100); 
+	x = 10.; 
+
+	for (int i=0; i<x.GetSize(); i++) {
+		if (fabs(x[i] - 10.)>1e-10) return false; 
+	}
+	return true; 
+}
+
 int main() {
 	HWCounter hwc; 
 	hwc.Reset(); 
 	Vector v(10); 
 	v.SetSize(15); 
 	TEST(v[14] == 0, "resize"); 
+
+	TEST(SetEqual(), "operator="); 
 
 	bool pass = true; 
 	for (int i=0; i<v.GetSize(); i++) {
