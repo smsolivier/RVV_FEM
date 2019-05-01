@@ -149,14 +149,15 @@ void Matrix::Mult(const Matrix& a, Matrix& b) const {
 	CHECK(Width()==a.Height()); 
 	b.SetSize(Height(), a.Width()); 
 #ifdef RV_MATMULT
-	MatMult_RV(Height(), Width(), GetData(), a.GetData(), b.GetData()); 
+	CH_TIMERS("rv matmult"); 
+	MatMult_RV(Height(), Width(), a.Width(), GetData(), a.GetData(), b.GetData()); 
 #else
 	Mult(1., a, 0., b); 
 #endif
 }
 
 void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {
-	CH_TIMERS("dgemm"); 
+	CH_TIMERS("dgemm (not vectorized)"); 
 	CHECK(Width() == B.Height()); 
 	CHECK(C.Height() == Height()); 
 	CHECK(C.Width() == B.Width()); 
@@ -177,7 +178,7 @@ void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {
 	for (int i=0; i<Height(); i++) {
 		for (int j=0; j<B.Width(); j++) {
 			for (int k=0; k<Width(); k++) {
-				C(i,j) += beta*C(i,j) + alpha*(*this)(i,k)*B(k,j); 
+				C(i,j) = beta*C(i,j) + alpha*(*this)(i,k)*B(k,j); 
 			}
 		}
 	}
@@ -188,7 +189,10 @@ void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
 	CH_TIMERS("add trans mult"); 
 	CHECK(Height()==a.Height()); 
 	CHECK(b.Width()==Width() && b.Height()==a.Width()); 
-
+#ifdef RV_ATM 
+	AddTransMult_RV(Height(), Width(), a.Width(), 
+		GetData(), a.GetData(), b.GetData()); 
+#else
 	for (int i=0; i<Width(); i++) {
 		for (int j=0; j<a.Width(); j++) {
 			for (int k=0; k<Height(); k++) {
@@ -196,6 +200,7 @@ void Matrix::AddTransMult(const Matrix& a, Matrix& b) const {
 			}
 		}
 	}
+#endif
 }
 
 void Matrix::Mult(const Vector& x, Vector& b) const {

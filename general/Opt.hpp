@@ -6,7 +6,8 @@
 #ifdef VECTORIZATION 
 // matrix optimizations 
 #define RV_MATVEC 
-// #define RV_MATMULT // not implemented 
+#define RV_MATMULT 
+#define RV_ATM 
 
 // vector optimizations 
 #define RV_VECADD 

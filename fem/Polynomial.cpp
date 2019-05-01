@@ -4,6 +4,7 @@ namespace fem
 {
 
 void GenLagrangePolynomials(int p, double a, double b, Array<Poly1D>& polys) {
+	CH_TIMERS("generate lagrange polynomials"); 
 	int N = p + 1; 
 	Vector x; 
 	x.Linspace(N, a, b); 
