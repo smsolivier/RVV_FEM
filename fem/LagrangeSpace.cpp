@@ -34,6 +34,19 @@ int FindMatch(const Node& node, const Array<int>& neighb,
 	return -2; 
 }
 
+int Search(Element* nel, Node& node, int max) {
+	CH_TIMERS("search through neighbors"); 
+	for (int i=0; i<nel->GetNumNodes(); i++) {
+		if (nel->GetNodeGlobalID(i) >= max) {
+			if (nel->GetNode(i).CheckEqual(node)) {
+				int id = nel->GetNodeGlobalID(i); 
+				if (id>=0) return id; 
+			}
+		}
+	}
+	return -1; 
+}
+
 bool InVector(const Array<int>& unique, int tag) {
 	for (int i=0; i<unique.GetSize(); i++) {
 		if (unique[i] == tag) return true; 
@@ -85,26 +98,62 @@ LagrangeSpace::LagrangeSpace(const Mesh& mesh, int order, int vdim)
 		}
 	}
 
-	// assign global id 
-	{
-		CH_TIMERS("relabel nodes"); 
-		Array<Node> nodes; 
-		int count = 0; 
-		for (int i=0; i<_el.GetSize(); i++) {
-			for (int j=0; j<_el[i]->GetNumNodes(); j++) {
-				int match = FindMatch(_el[i]->GetNode(j), nodes); 
-				// int match = FindMatch(_el[i]->GetNode(j), 
-					// mesh.GetElement(i).GetNeighbors(), _el); 
-				if (match >= 0) {
-					_el[i]->GetNode(j).SetGlobalID(match); 
+	// add linear nodes in 
+	{ CH_TIMERS("relabel nodes"); 
+	_nodes.Resize(mesh.GetNumNodes()); 
+	for (int n=0; n<mesh.GetNumNodes(); n++) {
+		const MeshNode& node = mesh.GetNode(n); 
+		_nodes[n] = Node(node.x, -1, node.id, node.bc); 
+	}
+
+	// add the rest in
+	int count = _nodes.GetSize(); 
+	for (int e=0; e<_el.GetSize(); e++) {
+		Element* el = _el[e]; 
+		const MeshEl& mel = mesh.GetElement(e); 
+		for (int n=0; n<el->GetNumNodes(); n++) {
+			if (el->GetNodeGlobalID(n)<0) {
+				Node& node = el->GetNode(n); 
+				const Array<int>& nei = mel.GetNeighbors(); 
+				int id = -1; 
+				for (int ne=0; ne<nei.GetSize(); ne++) {
+					if (nei[ne] >= 0 and nei[ne] < e) {
+						id = Search(_el[nei[ne]], node, mesh.GetNumNodes()); 
+						if (id >= 0) break; 
+					}
+				}
+
+				if (id>=0) {
+					node.SetGlobalID(id); 
 				} else {
-					_el[i]->GetNode(j).SetGlobalID(count++); 
-					nodes.Append(_el[i]->GetNode(j)); 
+					node.SetGlobalID(count++); 
+					_nodes.Append(node); 
 				}
 			}
 		}
-		_nodes = nodes; 
 	}
+	}
+
+	// assign global id 
+	// {
+	// 	CH_TIMERS("relabel nodes"); 
+	// 	Array<Node> nodes; 
+	// 	int count = 0; 
+	// 	for (int i=0; i<_el.GetSize(); i++) {
+	// 		for (int j=0; j<_el[i]->GetNumNodes(); j++) {
+	// 			int match = FindMatch(_el[i]->GetNode(j), nodes); 
+	// 			// int match = FindMatch(_el[i]->GetNode(j), 
+	// 				// mesh.GetElement(i).GetNeighbors(), _el); 
+	// 			if (match >= 0) {
+	// 				_el[i]->GetNode(j).SetGlobalID(match); 
+	// 			} else {
+	// 				_el[i]->GetNode(j).SetGlobalID(count++); 
+	// 				nodes.Append(_el[i]->GetNode(j)); 
+	// 			}
+	// 		}
+	// 	}
+	// 	_nodes = nodes; 
+	// }
 
 	for (int i=0; i<_nodes.GetSize(); i++) {
 		if (_nodes[i].GetBC() != INTERIOR) {
@@ -160,14 +209,15 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 	CH_TIMERS("build lagrange quad element"); 
 
 	for (int i=0; i<_geo_nodes.GetSize(); i++) {
-		// _nodes.Append(Node(_geo_nodes[i].x, _nodes.GetSize(), 
-			// _geo_nodes[i].id, _geo_nodes[i].bc)); 
 		_nodes.Append(Node(_geo_nodes[i].x, _nodes.GetSize(), 
-			-1, _geo_nodes[i].bc)); 
+			_geo_nodes[i].id, _geo_nodes[i].bc)); 
+		// _nodes.Append(Node(_geo_nodes[i].x, _nodes.GetSize(), 
+			// -1, _geo_nodes[i].bc)); 
 		_nodes[i].SetProcs(node_list[i].procs); 
 	}
 
 	if (_order == 2) {
+		CH_TIMERS("setup quadratic"); 
 		Array<Node> nodes = _nodes; 
 		for (int i=0; i<_nodes.GetSize(); i++) {
 			int next = (i+1)%_nodes.GetSize(); 
@@ -201,6 +251,7 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 	} 
 
 	else if (_order == 3) {
+		CH_TIMERS("setup cubic"); 
 		Array<Node> nodes = _nodes; 
 		for (int i=0; i<_nodes.GetSize(); i++) {
 			int next = (i+1)%_nodes.GetSize(); 
@@ -245,11 +296,13 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 
 	GenLagrangePolynomials(_order, -1, 1, _p); 
 	if (_order == 1) {
+		CH_TIMERS("setup linear shape"); 
 		_pp.Append(PolyProduct(_p[0], _p[0])); 
 		_pp.Append(PolyProduct(_p[1], _p[0])); 
 		_pp.Append(PolyProduct(_p[1], _p[1])); 
 		_pp.Append(PolyProduct(_p[0], _p[1])); 
 	} else if (_order == 2) {
+		CH_TIMERS("setup quadratic shape"); 
 		_pp.Append(PolyProduct(_p[0], _p[0])); 
 		_pp.Append(PolyProduct(_p[2], _p[0]));
 		_pp.Append(PolyProduct(_p[2], _p[2]));
@@ -261,7 +314,7 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 		_pp.Append(PolyProduct(_p[0], _p[1]));
 		_pp.Append(PolyProduct(_p[1], _p[1]));
 	} else if (_order == 3) {
-
+		CH_TIMERS("setup cubic shape"); 
 		// 0-3
 		_pp.Append(PolyProduct(_p[0], _p[0])); 
 		_pp.Append(PolyProduct(_p[3], _p[0])); 
@@ -287,15 +340,18 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 		ERROR("order " << _order << " not defined"); 
 	}
 
-	for (int i=0; i<_p.GetSize(); i++) {
-		_dp.Append(_p[i].Derivative()); 
-	}
+	{CH_TIMERS("gradients"); 
+	// for (int i=0; i<_p.GetSize(); i++) {
+	// 	_dp.Append(_p[i].Derivative()); 
+	// }
 
 	_dpp.Resize(_pp.GetSize()); 
 	for (int i=0; i<_pp.GetSize(); i++) {
 		_pp[i].Gradient(_dpp[i]); 
 	}
+	}
 
+	{CH_TIMERS("setup batched"); 
 	_shapex.Resize(_pp.GetSize()*(_order+1)); 
 	_shapey.Resize(_pp.GetSize()*(_order+1)); 
 
@@ -325,6 +381,7 @@ LagrangeQuad::LagrangeQuad(Array<MeshNode> node_list, int order, int mdim)
 			_dshapey[i*(_order+1)+j+GetNumNodes()*(_order+1)] = 
 				_dpp[i][1].Get1D(1).GetCoefs()[j]; 
 		}
+	}
 	}
 }
 

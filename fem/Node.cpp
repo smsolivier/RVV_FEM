@@ -10,6 +10,7 @@ Node::Node(Point x, int refID, int globalID, int bc)
 }
 
 bool Node::CheckEqual(const Node& node) const {
+	CH_TIMERS("check node equal"); 
 	for (int d=0; d<DIM; d++) {
 		if (!EQUAL(node.GetX()[d], _x[d])) return false; 
 	}

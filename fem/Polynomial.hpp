@@ -40,11 +40,21 @@ public:
 	inline double operator()(double x) const {return Eval(x); }
 
 	/// return the derivative of (*this) 
+	void Derivative(std::vector<double>& c) const {
+		CHECK(_c.size() > 0); 
+		c.resize(_c.size()-1); 
+		for (int i=1; i<_c.size(); i++) {
+			// c.push_back(_c[i]*i); 
+			c[i-1] = _c[i]*i; 
+		}
+	}
+
 	Poly1D Derivative() const {
 		CHECK(_c.size() > 0); 
-		std::vector<double> c; 
+		std::vector<double> c(_c.size()-1); 
 		for (int i=1; i<_c.size(); i++) {
-			c.push_back(_c[i]*i); 
+			// c.push_back(_c[i]*i); 
+			c[i-1] = _c[i]*i; 
 		}
 		return Poly1D(c); 
 	}
@@ -108,11 +118,14 @@ public:
 	/// get gradient of this 
 	void Gradient(Array<PolyProduct>& grad) const {
 		grad.Resize(_poly.GetSize()); 
+		std::vector<double> c; 
 		if (_poly.GetSize()==1) {
 			grad[0] = PolyProduct(_poly[0].Derivative()); 
 		} else if (_poly.GetSize()==2) {
-			grad[0] = PolyProduct(_poly[0].Derivative(), _poly[1]); 
-			grad[1] = PolyProduct(_poly[0], _poly[1].Derivative()); 
+			_poly[0].Derivative(c); 
+			grad[0] = PolyProduct(Poly1D(c), _poly[1]); 
+			_poly[1].Derivative(c); 
+			grad[1] = PolyProduct(_poly[0], Poly1D(c)); 
 		} else if (_poly.GetSize()==3) {
 			grad[0] = PolyProduct(_poly[0].Derivative(), _poly[1], _poly[2]); 
 			grad[1] = PolyProduct(_poly[0], _poly[1].Derivative(), _poly[2]); 
