@@ -38,8 +38,8 @@ batch:
 	setvl(t0, a0) # set to number of shape functions 
 	vslide v2, v2, t0 # zero v2 
 	vslide v3, v3, t0 # zero v3 
-	vaddi v4, v8, 0 # reset x to 1 
-	vaddi v5, v8, 0 # reset y to 1 
+	vslide v4, v8, x0 # reset x to 1 
+	vslide v5, v8, x0 # reset y to 1 
 	addi t2, a2, 0 # copy of x coefs 
 	addi t3, a3, 0 # copy of y coefs
 	addi t4, a1, 0 # copy of Nc 

@@ -368,7 +368,7 @@ void TraceTimer::report(bool a_closeAfter)
 
       sprintf(buf,"time.table");
       // static FILE* out = fopen(buf, "w");
-      static FILE* out = stderr; 
+      static FILE* out = stdout; 
       static int reportCount = 0;
       fprintf(out, "-----------\nTimer report %d (%d timers)\n--------------\n",
               reportCount, numCounters);

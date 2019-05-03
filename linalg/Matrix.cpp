@@ -159,8 +159,8 @@ double Matrix::Weight() const {
 void Matrix::Mult(const Matrix& a, Matrix& b) const {
 	CHECK(Width()==a.Height()); 
 	b.SetSize(Height(), a.Width()); 
+	CH_TIMERS("matmult"); 
 #ifdef RV_MATMULT
-	CH_TIMERS("rv matmult"); 
 	MatMult_RV(Height(), Width(), a.Width(), GetData(), a.GetData(), b.GetData()); 
 #else
 	Mult(1., a, 0., b); 
@@ -168,7 +168,7 @@ void Matrix::Mult(const Matrix& a, Matrix& b) const {
 }
 
 void Matrix::Mult(double alpha, const Matrix& B, double beta, Matrix& C) const {
-	CH_TIMERS("dgemm (not vectorized)"); 
+	CH_TIMERS("dgemm"); 
 	CHECK(Width() == B.Height()); 
 	CHECK(C.Height() == Height()); 
 	CHECK(C.Width() == B.Width()); 
