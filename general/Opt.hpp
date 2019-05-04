@@ -25,6 +25,7 @@
 // fematrix optimizations 
 #define RV_MVOUTER
 // #define RV_MVOUTERC 
+#define RV_UNROLL 
 
 // fespace optimizations 
 #define RV_SHAPE

@@ -26,18 +26,27 @@ void solve(int nref, int order) {
 	HWCounter lspace; 
 	LagrangeSpace h1(mesh, order); 
 	lspace.Read(); 
-	lspace.PrintStats("fe space"); 
+	lspace.PrintStats("setup lagrange space"); 
 
 	// matrix builder 
 	HWCounter hwc3; 
 	FEMatrix lhs(&h1); 
+	HWCounter wdi; 
 	lhs.AddIntegrator(new WeakDiffusionIntegrator); 
+	wdi.Read(); 
+	wdi.PrintStats("weak diffusion assemble"); 
+	HWCounter mi; 
 	lhs.AddIntegrator(new MassIntegrator); 
+	mi.Read(); 
+	mi.PrintStats("mass assemble"); 
 
 	// vector builder 
 	RHS rhs(&h1); 
 	ConstantCoefficient Source(1); 
+	HWCounter di; 
 	rhs.AddIntegrator(new DomainIntegrator(&Source, 0, 1)); 
+	di.Read(); 
+	di.PrintStats("domain integrator"); 
 
 	// apply the boundary conditions
 	lhs.ApplyDirichletBoundary(rhs, 0.);

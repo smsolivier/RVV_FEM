@@ -15,6 +15,15 @@
 // b batches of NxN scattered matvecs 
 extern "C" void MVOuter_RV(int N, int B, const double* mats, 
 	const int* dofs, const double* x, double* b); 
+// b batches of 4x4 matrices 
+extern "C" void MVOuter4_RV(int N, int B, const double* mats, 
+	const int* dofs, const double* x, double* b); 
+// b batches of 9x9 matrices 
+extern "C" void MVOuter9_RV(int N, int B, const double* mats, 
+	const int* dofs, const double* x, double* b); 
+// b batches of 16x16 matrices 
+extern "C" void MVOuter16_RV(int N, int B, const double* mats, 
+	const int* dofs, const double* x, double* b);
 // b batches of matvecs outputting to contiguous b 
 extern "C" void MVOuterC_RV(int N, int B, const double* mats, 
 	const int* dofs, const double* x, double* b); 

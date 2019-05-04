@@ -35,8 +35,24 @@ void FEMatrix::Mult(const Vector& x, Vector& b) const {
 #elif defined RV_MVOUTER 
 	if (_mats.GetSize()==0) ERROR("must call ConvertToBatch first"); 
 	int height = _data[0]->Height(); 
+#ifdef RV_UNROLL 
+	if (height==4) {
+		MVOuter4_RV(height, Ne, _mats.GetData(), 
+			_vdofs.GetData(), x.GetData(), b.GetData()); 
+	} else if (height==9) {
+		MVOuter9_RV(height, Ne, _mats.GetData(), 
+			_vdofs.GetData(), x.GetData(), b.GetData()); 
+	} else if (height==16) {
+		MVOuter16_RV(height, Ne, _mats.GetData(), 
+			_vdofs.GetData(), x.GetData(), b.GetData()); 
+	}
+	else {
+		ERROR("height = " << height << " not unrolled"); 
+	}
+#else
 	MVOuter_RV(height, Ne, _mats.GetData(), 
-		_vdofs.GetData(), x.GetData(), b.GetData()); 	
+		_vdofs.GetData(), x.GetData(), b.GetData()); 
+#endif
 #else
 	Array<int> vdofs; 
 	Vector elvec; 
